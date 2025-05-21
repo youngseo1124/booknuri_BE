@@ -38,7 +38,7 @@ public class AuthService {
             user.setEmail(id);
             user.setPassword(""); // 소셜 로그인은 비번 없음
             user.setRole("ROLE_USER");
-            user.setEnabled(1);
+            user.setEnabled(true);
             userRepository.save(user);
         }
 
@@ -98,10 +98,12 @@ public class AuthService {
         return newAccessToken;
     }
 
+    //유저아이디 중복체크
     public boolean isUsernameExists(String username) {
         return userRepository.existsByUsername(username);
     }
 
+    //이메일ㅇ 중복체크
     public boolean isEmailExists(String email) {
         return userRepository.existsByEmail(email);
     }
@@ -116,4 +118,8 @@ public class AuthService {
         userRepository.save(user);
         return true;
     }
+
+
+
+
 }

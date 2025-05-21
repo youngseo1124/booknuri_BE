@@ -24,7 +24,7 @@ public class UserJoinConverter {
                 .nickname(dto.getNickname())
                 .email(dto.getEmail())
                 .role("ROLE_USER")
-                .enabled(1)
+                .enabled(true)
                 .build();
     }
 }

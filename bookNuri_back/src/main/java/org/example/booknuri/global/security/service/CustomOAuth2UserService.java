@@ -69,7 +69,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             user.setRole("ROLE_USER");
             user.setPassword(""); // 소셜 로그인은 비밀번호 없음
             user.setEmail(id);
-            user.setEnabled(1);
+            user.setEnabled(true);
             userRepository.save(user);
         }
 

@@ -48,6 +48,13 @@ public class UserEntity {
     private String email;
 
 
+    @Column
+    private String gender; // "M", "F", "O" 등
+
+    @Column
+    private Integer birthYear; // 예: 1999
+
+
 
     @Column
     private String role;  // 사용자의 권한 (예: "ROLE_USER" 또는 "ROLE_ADMIN")
@@ -61,7 +68,7 @@ public class UserEntity {
     private Date updatedAt;
 
     @Column(nullable = false)
-    private int enabled = 1;
+    private boolean enabled = true;
 
     //내 도서관
     @ManyToOne

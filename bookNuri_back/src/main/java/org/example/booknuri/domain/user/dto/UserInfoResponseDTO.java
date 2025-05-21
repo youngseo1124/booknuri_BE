@@ -17,4 +17,8 @@ public class UserInfoResponseDTO {
     private boolean enabled;         // 계정 활성화 여부
 
     private LibrarySimpleDTO myLibrary;  // 선택한 내 도서관 정보
+
+    private String gender; //M,F
+    private Integer birthYear;
+
 }

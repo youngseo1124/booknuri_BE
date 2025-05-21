@@ -17,7 +17,8 @@ public class LibraryController {
 
     private final LibraryService libraryService;
 
-    @GetMapping("/all/paged")
+    //(페이지네이션o) 모든 도서관 정보 리스트 반환
+    @GetMapping("/all")
     public ResponseEntity<List<LibraryResponseDto>> getAllLibrariesPaged(
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "20") int limit
@@ -25,8 +26,8 @@ public class LibraryController {
         return libraryService.getAllLibrariesPaged(offset, limit);
     }
 
-    // 지역 기반 페이지네이션
-    @GetMapping("/region/paged")
+    //(페이지네이션o) 도서관 지역 필터링 검색(si로 필터링)
+    @GetMapping("/search/region")
     public ResponseEntity<List<LibraryResponseDto>> getBySiPaged(
             @RequestParam String si,
             @RequestParam(defaultValue = "0") int offset,
@@ -35,8 +36,8 @@ public class LibraryController {
         return libraryService.getLibrariesBySiPaged(si, offset, limit);
     }
 
-    // 지역 + 시군구 기반 페이지네이션
-    @GetMapping("/region/detail/paged")
+    //(페이지네이션o) 도서관 시군구 기반 필터링 si+gu로 필터링)
+    @GetMapping("/search/region/detail")
     public ResponseEntity<List<LibraryResponseDto>> getBySiAndGuPaged(
             @RequestParam String si,
             @RequestParam String gu,

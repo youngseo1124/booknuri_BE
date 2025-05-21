@@ -93,7 +93,7 @@ public class AuthController {
         log.info("아이디 중복 체크 요청: {}", username);
 
         // 아이디가 이미 존재하는지 확인
-        boolean exists = userService.isUsernameExists(username);
+        boolean exists = authService.isUsernameExists(username);
 
         // 아이디가 이미 존재하면 "중복된 아이디" 반환
         if (exists) {
@@ -111,7 +111,7 @@ public class AuthController {
         log.info("이메일 중복 체크 요청: {}", email);
 
         // 이메일이 이미 존재하는지 확인
-        boolean exists = userService.isEmailExists(email);
+        boolean exists = authService.isEmailExists(email);
 
         // 이메일이 이미 존재하면 "중복된 이메일" 반환
         if (exists) {

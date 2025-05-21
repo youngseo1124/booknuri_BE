@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.user.converter.UserConverter;
+import org.example.booknuri.domain.user.dto.SetMyLibraryRequestDTO;
+import org.example.booknuri.domain.user.dto.SetUserSexAndBirthRequestDTO;
 import org.example.booknuri.domain.user.dto.UserInfoResponseDTO;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.global.security.entity.CustomUser;
@@ -39,79 +41,46 @@ public class UserController {
 
     //  로그인한 사용자 정보 조회 API
     @GetMapping("/info")
-    public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal CustomUser customUser) {
+    public ResponseEntity<UserInfoResponseDTO> getUserInfo(@AuthenticationPrincipal CustomUser customUser) {
 
         UserEntity user=userService.getUserByUsername(customUser.getUsername());
         UserInfoResponseDTO dto = userConverter.toDTO(user);
         return ResponseEntity.ok(dto);
     }
 
+    // 내 도서관 설정 API
+    @PatchMapping("/my-library")
+    public ResponseEntity<String> setMyLibrary(
+            @AuthenticationPrincipal CustomUser customUser,
+            @RequestBody SetMyLibraryRequestDTO dto
+    ) {
+        boolean result = userService.setMyLibrary(customUser.getUsername(), dto.getLibCode());
 
-
-
-    // 아이디 중복 체크 메서드
-    @GetMapping("/check/username/{username}")
-    public ResponseEntity<?> checkUsername(@PathVariable("username") String username) {
-        log.info("아이디 중복 체크 요청: {}", username);
-
-        // 아이디가 이미 존재하는지 확인
-        boolean exists = userService.isUsernameExists(username);
-
-        // 아이디가 이미 존재하면 "중복된 아이디" 반환
-        if (exists) {
-            log.info("아이디가 중복되었습니다.");
-            return new ResponseEntity<>("아이디가 중복됩니다.", HttpStatus.BAD_REQUEST);
+        if (result) {
+            return ResponseEntity.ok().body("내 도서관 설정 완료!");
         } else {
-            log.info("아이디 사용 가능.");
-            return new ResponseEntity<>("아이디 사용 가능", HttpStatus.OK);
+            return ResponseEntity.badRequest().body("도서관 설정 실패 (유저 또는 도서관 없음)");
         }
     }
 
-    // 이메일 중복 체크 메서드
-    @GetMapping("/check/email/{email}")
-    public ResponseEntity<?> checkEmail(@PathVariable("email") String email) {
-        log.info("이메일 중복 체크 요청: {}", email);
 
-        // 이메일이 이미 존재하는지 확인
-        boolean exists = userService.isEmailExists(email);
+    @PatchMapping("/sex-birth")
+    public ResponseEntity<?> setUserSexAndBirth(
+            @AuthenticationPrincipal CustomUser customUser,
+            @RequestBody SetUserSexAndBirthRequestDTO dto
+    ) {
+        boolean result = userService.setUserSexAndBirth(
+                customUser.getUsername(),
+                dto.getGender(),
+                dto.getBirthYear()
+        );
 
-        // 이메일이 이미 존재하면 "중복된 이메일" 반환
-        if (exists) {
-            log.info("이메일이 중복되었습니다.");
-            return new ResponseEntity<>("이메일이 중복됩니다.", HttpStatus.BAD_REQUEST);
+        if (result) {
+            return ResponseEntity.ok("성별 및 출생년도 설정 완료!");
         } else {
-            log.info("이메일 사용 가능.");
-            return new ResponseEntity<>("이메일 사용 가능", HttpStatus.OK);
+            return ResponseEntity.badRequest().body("유저를 찾을 수 없습니다.");
         }
     }
-
-
-
-
-    // 회원 삭제(탈퇴), username기준
-    @PreAuthorize(" hasRole('ROLE_ADMIN') or #p0 == authentication.name ")
-    @DeleteMapping("/{username}")
-    public ResponseEntity<?> delete(
-            @PathVariable("username") String username
-    ) throws Exception {
-        try {
-            boolean result = userService.deleteUserByUsername(username);
-            if( result )
-                return new ResponseEntity<>("SUCCESS", HttpStatus.OK);
-            else
-                return new ResponseEntity<>("FAIL", HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>("FAIL", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-
-
-
-
-
-
 
 
 

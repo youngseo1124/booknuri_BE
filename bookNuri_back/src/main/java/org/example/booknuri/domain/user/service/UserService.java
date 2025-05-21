@@ -26,6 +26,8 @@ package org.example.booknuri.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 
+import org.example.booknuri.domain.library.entity.LibraryEntity;
+import org.example.booknuri.domain.library.repository.LibraryRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.user.repository.UsersRepository;
 import org.example.booknuri.global.security.provider.JwtProvider;
@@ -41,13 +43,7 @@ public class UserService {
 
     private final UsersRepository usersRepository; // UsersRepository 의존성 주입
 
-    private final PasswordEncoder passwordEncoder; // 비밀번호 암호화를 위한 의존성 주입
-
-    private final JwtProvider jwtProvider;
-    private final RedisTemplate<String, String> redisTemplate;
-
-
-
+    private final LibraryRepository libraryRepository;
 
 
 
@@ -70,41 +66,30 @@ public class UserService {
         return false; // 사용자 정보가 없으면 삭제할 수 없음
     }
 
-    /**
-     * 아이디(유저네임) 중복 체크
-     * @param username 사용자 아이디
-     * @return 이미 존재하는 아이디면 true, 아니면 false
-     */
-    public boolean isUsernameExists(String username) {
-        // 사용자 아이디로 조회하여 존재 여부 확인
-        return usersRepository.existsByUsername(username);  // JPA에서 제공하는 existsById 메서드를 사용
-    }
 
-    /**
-     * 이메일 중복 체크
-     * @param email 사용자 이메일
-     * @return 이미 존재하는 이메일이면 true, 아니면 false
-     */
-    public boolean isEmailExists(String email) {
-        // 사용자 이메일로 조회하여 존재 여부 확인
-        return usersRepository.existsByEmail(email);  // 이메일에 대해 중복 체크
+    //  내 도서관 설정
+    public boolean setMyLibrary(String username, String libCode) {
+        UserEntity user = usersRepository.findByUsername(username);
+        LibraryEntity library = libraryRepository.findByLibCode(libCode);
+
+        if (user == null || library == null) return false;
+
+        user.setMyLibrary(library);
+        usersRepository.save(user); // 변경사항 저장
+        return true;
     }
 
 
+    //최초로그인시 성별이랑 출생년도 받기
+    public boolean setUserSexAndBirth(String username, String gender, Integer birthYear) {
+        UserEntity user = usersRepository.findByUsername(username);
+        if (user == null) return false;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        user.setGender(gender);
+        user.setBirthYear(birthYear);
+        usersRepository.save(user);
+        return true;
+    }
 
 
 

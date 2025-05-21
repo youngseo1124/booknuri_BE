@@ -23,6 +23,7 @@ public class LibraryResponseDto {
     private Double longitude;
     private Integer bookCount;
 
+
     private String si;
     private String gu;
 }
