@@ -26,10 +26,37 @@ public class LibraryService {
 
 
 
-   //전체도서관 리스트 페이지네이션 목록
-    public ResponseEntity<List<LibraryResponseDto>> getAllLibrariesPaged(int offset, int limit) {
+   //전체도서관 리스트 페이지네이션 목록+ (도서관 제목 검색 )
+   public ResponseEntity<List<LibraryResponseDto>> getAllLibrariesPaged(int offset, int limit, String keyword) {
+       PageRequest pageRequest = PageRequest.of(offset / limit, limit);
+       Page<LibraryEntity> page;
+
+       if (keyword != null && !keyword.isBlank()) {
+           page = libraryRepository.findByLibNameContainingIgnoreCase(keyword, pageRequest);
+       } else {
+           page = libraryRepository.findAll(pageRequest);
+       }
+
+       List<LibraryResponseDto> result = page.getContent().stream()
+               .map(libraryConverter::toDto)
+               .collect(Collectors.toList());
+
+       return ResponseEntity.ok(result);
+   }
+
+
+
+
+    //페이지네이션+ // 지역만 선택한 경우 (예: '대구광역시')+ (도서관 이름 검색)
+    public ResponseEntity<List<LibraryResponseDto>> getLibrariesBySiPaged(String si, int offset, int limit, String keyword) {
         PageRequest pageRequest = PageRequest.of(offset / limit, limit);
-        Page<LibraryEntity> page = libraryRepository.findAll(pageRequest);
+        Page<LibraryEntity> page;
+
+        if (keyword != null && !keyword.isBlank()) {
+            page = libraryRepository.findByRegion_SiAndLibNameContainingIgnoreCase(si, keyword, pageRequest);
+        } else {
+            page = libraryRepository.findByRegion_Si(si, pageRequest);
+        }
 
         List<LibraryResponseDto> result = page.getContent().stream()
                 .map(libraryConverter::toDto)
@@ -38,28 +65,36 @@ public class LibraryService {
         return ResponseEntity.ok(result);
     }
 
-
-
-
-    //페이지네이션+ // 지역만 선택한 경우 (예: '대구광역시')
-    public ResponseEntity<List<LibraryResponseDto>> getLibrariesBySiPaged(String si, int offset, int limit) {
+    //페이지네이션+   // 지역 + 시/군/구 모두 선택한 경우 (예: '대구광역시', '달서구')+(도서관 이름 검색)
+    public ResponseEntity<List<LibraryResponseDto>> getLibrariesBySiAndGuPaged(String si, String gu, int offset, int limit, String keyword) {
         PageRequest pageRequest = PageRequest.of(offset / limit, limit);
-        Page<LibraryEntity> page = libraryRepository.findByRegion_Si(si, pageRequest);
+        Page<LibraryEntity> page;
+
+        if (keyword != null && !keyword.isBlank()) {
+            page = libraryRepository.findByRegion_SiAndRegion_GuAndLibNameContainingIgnoreCase(si, gu, keyword, pageRequest);
+        } else {
+            page = libraryRepository.findByRegion_SiAndRegion_Gu(si, gu, pageRequest);
+        }
+
         List<LibraryResponseDto> result = page.getContent().stream()
                 .map(libraryConverter::toDto)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(result);
     }
 
-    //페이지네이션+   // 지역 + 시/군/구 모두 선택한 경우 (예: '대구광역시', '달서구')
-    public ResponseEntity<List<LibraryResponseDto>> getLibrariesBySiAndGuPaged(String si, String gu, int offset, int limit) {
+    //페이지네이션+  전체도서관 대상으로 도서관 이름으로 검색
+    public ResponseEntity<List<LibraryResponseDto>> searchByLibraryName(String keyword, int offset, int limit) {
         PageRequest pageRequest = PageRequest.of(offset / limit, limit);
-        Page<LibraryEntity> page = libraryRepository.findByRegion_SiAndRegion_Gu(si, gu, pageRequest);
+        Page<LibraryEntity> page = libraryRepository.findByLibNameContainingIgnoreCase(keyword, pageRequest);
+
         List<LibraryResponseDto> result = page.getContent().stream()
                 .map(libraryConverter::toDto)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(result);
     }
+
 
 
 

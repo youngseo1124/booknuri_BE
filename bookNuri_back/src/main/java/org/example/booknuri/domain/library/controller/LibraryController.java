@@ -17,35 +17,50 @@ public class LibraryController {
 
     private final LibraryService libraryService;
 
-    //(페이지네이션o) 모든 도서관 정보 리스트 반환
+    // 전체 도서관 조회 (keyword 있을 경우 포함)
     @GetMapping("/all")
     public ResponseEntity<List<LibraryResponseDto>> getAllLibrariesPaged(
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "20") int limit
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(required = false) String keyword
     ) {
-        return libraryService.getAllLibrariesPaged(offset, limit);
+        return libraryService.getAllLibrariesPaged(offset, limit, keyword);
     }
 
-    //(페이지네이션o) 도서관 지역 필터링 검색(si로 필터링)
+    //(페이지네이션o)시(지역) 기반 검색 (keyword 있을 경우 포함)
     @GetMapping("/search/region")
     public ResponseEntity<List<LibraryResponseDto>> getBySiPaged(
             @RequestParam String si,
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "20") int limit
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(required = false) String keyword
     ) {
-        return libraryService.getLibrariesBySiPaged(si, offset, limit);
+        return libraryService.getLibrariesBySiPaged(si, offset, limit, keyword);
     }
 
-    //(페이지네이션o) 도서관 시군구 기반 필터링 si+gu로 필터링)
+
+    //(페이지네이션o)시 + 구 기반 검색 (keyword 있을 경우 포함)
     @GetMapping("/search/region/detail")
     public ResponseEntity<List<LibraryResponseDto>> getBySiAndGuPaged(
             @RequestParam String si,
             @RequestParam String gu,
             @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(required = false) String keyword
+    ) {
+        return libraryService.getLibrariesBySiAndGuPaged(si, gu, offset, limit, keyword);
+    }
+
+    // (페이지네이션o)도서관명 LIKE 검색
+    @GetMapping("/search/name")
+    public ResponseEntity<List<LibraryResponseDto>> searchByLibraryName(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        return libraryService.getLibrariesBySiAndGuPaged(si, gu, offset, limit);
+        return libraryService.searchByLibraryName(keyword, offset, limit);
     }
+
 
 
 
