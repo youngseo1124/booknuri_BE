@@ -43,7 +43,7 @@ public class SecurityConfig {
 
 
 
-    // ✅ 비밀번호 암호화 빈 등록
+    // 비밀번호 암호화 빈 등록
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -51,7 +51,7 @@ public class SecurityConfig {
 
 
 
-    // ✅ AuthenticationManager 등록
+    //  AuthenticationManager 등록
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -59,7 +59,7 @@ public class SecurityConfig {
         return authManagerBuilder.build();
     }
 
-    // ✅ CORS 설정 (React 프론트엔드 허용)
+    //  CORS 설정 (React 프론트엔드 허용)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -82,7 +82,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // 🔥 CSRF 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 🔥 세션 사용 X
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","/userlogin","/users/**", "/oauth2/**", "/auth/**","/users/join").permitAll() // 🔥 `/login`, `/oauth2/**` 인증 없이 허용
+                        .requestMatchers("/login","/userlogin", "/oauth2/**", "/auth/**","/users/join").permitAll() // 🔥 `/login`, `/oauth2/**` 인증 없이 허용
                         .anyRequest().authenticated()
                 );
 

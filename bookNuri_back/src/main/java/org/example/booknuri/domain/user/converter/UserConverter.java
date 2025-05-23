@@ -18,7 +18,7 @@ public class UserConverter {
                 .role(user.getRole())
                 .enabled(user.isEnabled())
                 .gender(user.getGender())
-                .birthYear(user.getBirthYear())
+                .birth(user.getBirth())
                 .myLibrary(user.getMyLibrary() == null ? null : toLibrarySimpleDTO(user))
                 .build();
     }

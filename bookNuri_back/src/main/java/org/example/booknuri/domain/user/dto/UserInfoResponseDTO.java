@@ -19,6 +19,4 @@ public class UserInfoResponseDTO {
     private LibrarySimpleDTO myLibrary;  // 선택한 내 도서관 정보
 
     private String gender; //M,F
-    private Integer birthYear;
-
-}
+    private Integer birth; }

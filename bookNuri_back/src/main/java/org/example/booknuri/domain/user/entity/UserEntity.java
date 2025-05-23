@@ -49,10 +49,10 @@ public class UserEntity {
 
 
     @Column
-    private String gender; // "M", "F", "O" 등
+    private String gender; // "M", "F"
 
     @Column
-    private Integer birthYear; // 예: 1999
+    private Integer birth; // 예: 19981124
 
 
 

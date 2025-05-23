@@ -81,12 +81,20 @@ public class UserService {
 
 
     //최초로그인시 성별이랑 출생년도 받기
-    public boolean setUserSexAndBirth(String username, String gender, Integer birthYear) {
+    // 성별 설정
+    public boolean setUserGender(String username, String gender) {
         UserEntity user = usersRepository.findByUsername(username);
         if (user == null) return false;
-
         user.setGender(gender);
-        user.setBirthYear(birthYear);
+        usersRepository.save(user);
+        return true;
+    }
+
+    // 출생년도 설정
+    public boolean setUserBirthYear(String username, Integer birth) {
+        UserEntity user = usersRepository.findByUsername(username);
+        if (user == null) return false;
+        user.setBirth(birth);
         usersRepository.save(user);
         return true;
     }

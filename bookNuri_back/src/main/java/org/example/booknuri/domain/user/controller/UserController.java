@@ -10,9 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.user.converter.UserConverter;
-import org.example.booknuri.domain.user.dto.SetMyLibraryRequestDTO;
-import org.example.booknuri.domain.user.dto.SetUserSexAndBirthRequestDTO;
-import org.example.booknuri.domain.user.dto.UserInfoResponseDTO;
+import org.example.booknuri.domain.user.dto.*;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.example.booknuri.global.security.provider.JwtProvider;
@@ -64,23 +62,28 @@ public class UserController {
     }
 
 
-    @PatchMapping("/sex-birth")
-    public ResponseEntity<?> setUserSexAndBirth(
+    // 성별만 설정
+    @PatchMapping("/sex")
+    public ResponseEntity<?> setUserSex(
             @AuthenticationPrincipal CustomUser customUser,
-            @RequestBody SetUserSexAndBirthRequestDTO dto
+            @RequestBody SetUserGenderRequestDTO dto
     ) {
-        boolean result = userService.setUserSexAndBirth(
-                customUser.getUsername(),
-                dto.getGender(),
-                dto.getBirthYear()
-        );
-
-        if (result) {
-            return ResponseEntity.ok("성별 및 출생년도 설정 완료!");
-        } else {
-            return ResponseEntity.badRequest().body("유저를 찾을 수 없습니다.");
-        }
+        boolean result = userService.setUserGender(customUser.getUsername(), dto.getGender());
+        return result ? ResponseEntity.ok("성별 설정 완료!") :
+                ResponseEntity.badRequest().body("유저를 찾을 수 없습니다.");
     }
+
+    // 출생년도만 설정
+    @PatchMapping("/birth")
+    public ResponseEntity<?> setUserBirth(
+            @AuthenticationPrincipal CustomUser customUser,
+            @RequestBody SetUserBirthRequestDTO dto
+    ) {
+        boolean result = userService.setUserBirthYear(customUser.getUsername(), dto.getBirth());
+        return result ? ResponseEntity.ok("출생년도 설정 완료!") :
+                ResponseEntity.badRequest().body("유저를 찾을 수 없습니다.");
+    }
+
 
 
 
