@@ -1,4 +1,3 @@
-//도서관별 소장목록api 응답용+ 도서상세정보api 응답용 dto 두 목적으로 쓰고있음
 
 package org.example.booknuri.domain.book.dto;
 
@@ -7,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//도서상세정보 정적데이터 다루는 dto
 
 @Data
 @NoArgsConstructor

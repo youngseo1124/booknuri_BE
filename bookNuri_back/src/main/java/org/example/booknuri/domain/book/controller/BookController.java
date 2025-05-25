@@ -2,16 +2,23 @@ package org.example.booknuri.domain.book.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.booknuri.domain.BookReview.converter.BookReviewConverter;
+import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
+import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
+import org.example.booknuri.domain.BookReview.repository.BookReviewRepository;
 import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
 import org.example.booknuri.domain.book.service.BookService;
+import org.example.booknuri.global.security.entity.CustomUser;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.global.security.provider.JwtProvider;
 import org.example.booknuri.domain.user.service.UserService;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,16 +41,26 @@ public class BookController {
     private final RedisTemplate<String, String> redisTemplate;
     private final BookClinetApiInfoConverter bookInfoConverter;
     private final BookService bookService;
+    private final BookReviewConverter bookReviewConverter;
+    private final BookReviewRepository bookReviewRepository;
 
 
-    // ISBN으로 도서 상세 조회
     @GetMapping("/{isbn13}")
-    public BookInfoResponseDto getBookDetail(@PathVariable String isbn13) {
-        return bookService.getBookDetailByIsbn(isbn13);
+    public BookTotalInfoDto getBookDetail(@PathVariable String isbn13,
+                                          @AuthenticationPrincipal CustomUser currentUser) {
+        // 1. 책 정보 (캐시 or DB)
+        BookInfoResponseDto bookInfo = bookService.getBookDetailByIsbn(isbn13);
+
+        // 2. 리뷰 정보 (DB)
+        List<BookReviewEntity> reviews = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13);
+        List<BookReviewResponseDto> reviewDtos = bookReviewConverter.toDtoList(reviews, currentUser.getUser());
+
+        // 3. 통합 응답 DTO로 묶어서 반환
+        return BookTotalInfoDto.builder()
+                .bookInfo(bookInfo)
+                .reviews(reviewDtos)
+                .build();
     }
-
-
-
 
 
 

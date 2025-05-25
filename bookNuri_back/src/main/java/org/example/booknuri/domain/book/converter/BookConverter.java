@@ -2,7 +2,9 @@ package org.example.booknuri.domain.book.converter;
 
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BookConverter {
 
     public static BookInfoResponseDto toBookInfoResponseDto(BookEntity book) {

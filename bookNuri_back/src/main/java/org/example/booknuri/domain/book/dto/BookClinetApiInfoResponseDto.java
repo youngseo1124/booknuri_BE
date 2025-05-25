@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+//clientapit도서관별 소장목록api 응답용로 쓰고있음
 
 
 @Data
