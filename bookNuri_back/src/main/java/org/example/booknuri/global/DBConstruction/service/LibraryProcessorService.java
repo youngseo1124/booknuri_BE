@@ -3,8 +3,8 @@ package org.example.booknuri.global.DBConstruction.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.book.converter.BookInfoConverter;
-import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
+import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.library.entity.LibraryBookEntity;
@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class LibraryProcessorService {
 
     private final LibraryBookApiClient apiClient;
-    private final BookInfoConverter bookConverter;
+    private final BookClinetApiInfoConverter bookConverter;
     private final BookRepository bookRepository;
     private final LibraryBookRepository libraryBookRepository;
 
@@ -42,10 +42,10 @@ public class LibraryProcessorService {
             log.info("📖 [START] {} 도서관 도서 처리 시작", libCode);
 
             // 해당 도서관에서 책 기본 정보 리스트 받아옴 (isbn13, 등록일 등)
-            List<BookInfoResponseDto> bookList = apiClient.fetchBooksFromLibrary(libCode);
+            List<BookClinetApiInfoResponseDto> bookList = apiClient.fetchBooksFromLibrary(libCode);
             log.info(" {} 도서관 - 도서 수집 완료 ({}권)", libCode, bookList.size());
 
-            for (BookInfoResponseDto basicDto : bookList) {
+            for (BookClinetApiInfoResponseDto basicDto : bookList) {
                 String isbn = basicDto.getIsbn13();
                 String regDate = basicDto.getRegDate();
 
@@ -94,7 +94,7 @@ public class LibraryProcessorService {
         try {
             Thread.sleep(150);
             JsonNode bookNode = apiClient.fetchBookDetailByIsbn(isbn);
-            BookInfoResponseDto detailDto = bookConverter.toDto(bookNode);
+            BookClinetApiInfoResponseDto detailDto = bookConverter.toDto(bookNode);
             book = bookConverter.toEntity(detailDto);
 
             book = bookRepository.save(book);

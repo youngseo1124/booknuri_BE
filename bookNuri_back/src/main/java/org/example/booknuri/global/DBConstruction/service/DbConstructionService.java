@@ -1,7 +1,7 @@
 package org.example.booknuri.global.DBConstruction.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.book.converter.BookInfoConverter;
+import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.global.DBConstruction.client.LibraryApiClient;
 import org.example.booknuri.domain.library.converter.LibraryConverter;
@@ -26,7 +26,7 @@ public class DbConstructionService {
     private final LibraryApiClient apiClient;
     private final LibraryConverter libraryConverter;
     private final BookRepository bookRepository;
-    private final BookInfoConverter bookConverter;
+    private final BookClinetApiInfoConverter bookConverter;
     private final LibraryProcessorService processorService;
 
 

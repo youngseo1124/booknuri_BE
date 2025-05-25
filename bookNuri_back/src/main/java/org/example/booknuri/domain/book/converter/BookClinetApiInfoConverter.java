@@ -2,7 +2,7 @@ package org.example.booknuri.domain.book.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.entity.MainCategory;
 import org.example.booknuri.domain.book.entity.MiddleCategory;
@@ -13,7 +13,7 @@ import org.example.booknuri.domain.book.repository.SubCategoryRepository;
 import org.springframework.stereotype.Component;
 @Component // 스프링에서 이 클래스를 Bean으로 등록해줌. 즉, 의존성 주입 받을 수 있게해줌
 @RequiredArgsConstructor
-public class BookInfoConverter {
+public class BookClinetApiInfoConverter {
 
     private final MainCategoryRepository mainCategoryRepository;
     private final MiddleCategoryRepository middleCategoryRepository;
@@ -21,12 +21,12 @@ public class BookInfoConverter {
 
     // 📘 외부 API JSON → BookInfoDto 변환
 
-    public BookInfoResponseDto toDto(JsonNode bookNode) {
+    public BookClinetApiInfoResponseDto toDto(JsonNode bookNode) {
 
         String classNm = bookNode.path("class_nm").asText();
         String[] categoryParts = classNm.split(" > ");
 
-        return BookInfoResponseDto.builder()
+        return BookClinetApiInfoResponseDto.builder()
                 .bookname(bookNode.path("bookname").asText())
                 .authors(bookNode.path("authors").asText())
                 .publisher(bookNode.path("publisher").asText())
@@ -41,7 +41,7 @@ public class BookInfoConverter {
                 .build();
     }
 
-    public BookEntity toEntity(BookInfoResponseDto dto) {
+    public BookEntity toEntity(BookClinetApiInfoResponseDto dto) {
         // 카테고리 이름 파싱
         String main = dto.getMainCategory();
         String middle = dto.getMiddleCategory();

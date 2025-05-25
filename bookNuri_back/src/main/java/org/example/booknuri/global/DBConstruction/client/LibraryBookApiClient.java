@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,10 +30,10 @@ public class LibraryBookApiClient {
     private String authKey;
 
     // ✅ 도서관 책 목록 수집 (도서관 코드 기반, 전체 페이지 탐색)
-    public List<BookInfoResponseDto> fetchBooksFromLibrary(String libCode) {
+    public List<BookClinetApiInfoResponseDto> fetchBooksFromLibrary(String libCode) {
         log.info("[{}] 도서관 - 도서 목록 수집 시작", libCode);
 
-        List<BookInfoResponseDto> results = new ArrayList<>();
+        List<BookClinetApiInfoResponseDto> results = new ArrayList<>();
         int page = 1;
 
         while (true) {
@@ -104,7 +104,7 @@ public class LibraryBookApiClient {
                 String isbn13 = getSafeText(el, "isbn13");
                 String regDate = getSafeText(el, "reg_date");
 
-                results.add(BookInfoResponseDto.builder()
+                results.add(BookClinetApiInfoResponseDto.builder()
                         .isbn13(isbn13)
                         .regDate(regDate)
                         .build());

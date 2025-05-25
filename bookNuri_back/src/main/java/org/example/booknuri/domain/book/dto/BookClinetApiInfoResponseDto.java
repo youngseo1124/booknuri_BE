@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookInfoResponseDto {
+public class BookClinetApiInfoResponseDto {
     private String bookname;
     private String authors;
     private String publisher;
@@ -20,9 +20,13 @@ public class BookInfoResponseDto {
     private String isbn13;
     private String description;
     private String bookImageURL;
+    private String classNm;
     private String mainCategory;
     private String middleCategory;
     private String subCategory;
+
+    // LibraryBookEntity용
+    private String regDate;
 
 
 }

@@ -2,8 +2,10 @@ package org.example.booknuri.domain.book.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.booknuri.domain.book.converter.BookInfoConverter;
+import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
+import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.service.BookService;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,7 @@ import org.example.booknuri.global.security.provider.JwtProvider;
 import org.example.booknuri.domain.user.service.UserService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -28,10 +31,16 @@ import java.util.stream.Collectors;
 @RequestMapping("/book")
 public class BookController {
 
-    private final UserService userService;
-    private final JwtProvider jwtProvider;
     private final RedisTemplate<String, String> redisTemplate;
-    private final BookInfoConverter bookInfoConverter;
+    private final BookClinetApiInfoConverter bookInfoConverter;
+    private final BookService bookService;
+
+
+    // ISBN으로 도서 상세 조회
+    @GetMapping("/{isbn13}")
+    public BookInfoResponseDto getBookDetail(@PathVariable String isbn13) {
+        return bookService.getBookDetailByIsbn(isbn13);
+    }
 
 
 
@@ -60,9 +69,9 @@ public class BookController {
     private String authKey;
 
     @GetMapping("/random")
-    public BookInfoResponseDto getRandomBookInfo() {
+    public BookClinetApiInfoResponseDto getRandomBookInfo() {
         String isbn = sampleIsbnList.get(new Random().nextInt(sampleIsbnList.size()));
-        log.info("🔍 선택된 ISBN: {}", isbn);
+        log.info("선택된 ISBN: {}", isbn);
 
         String url = "https://data4library.kr/api/srchDtlList?authKey=" + authKey
                 + "&isbn13=" + isbn
@@ -89,7 +98,7 @@ public class BookController {
 
 
     @GetMapping("/list")
-    public List<BookInfoResponseDto> getAllBookInfoListParallel() {
+    public List<BookClinetApiInfoResponseDto> getAllBookInfoListParallel() {
         RestTemplate restTemplate = new RestTemplate();
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -97,7 +106,7 @@ public class BookController {
         ExecutorService executor = Executors.newFixedThreadPool(10);
 
         // ✅ sampleIsbnList 각각에 대해 병렬로 요청
-        List<CompletableFuture<BookInfoResponseDto>> futureList = sampleIsbnList.stream()
+        List<CompletableFuture<BookClinetApiInfoResponseDto>> futureList = sampleIsbnList.stream()
                 .map(isbn -> CompletableFuture.supplyAsync(() -> {
                     try {
                         log.info("📖 [비동기] 조회중 ISBN: {}", isbn);
@@ -120,7 +129,7 @@ public class BookController {
                 .collect(Collectors.toList());
 
         // ✅ 모든 비동기 작업이 완료될 때까지 기다리고, 결과를 모은다
-        List<BookInfoResponseDto> bookList = futureList.stream()
+        List<BookClinetApiInfoResponseDto> bookList = futureList.stream()
                 .map(CompletableFuture::join) // 결과 꺼내기 (join은 예외 throw 안 하고 null 리턴)
                 .filter(dto -> dto != null)   // 실패한 항목은 제외
                 .collect(Collectors.toList());
