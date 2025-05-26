@@ -30,8 +30,16 @@ public class BookReviewReportEntity {
 
     // 어떤 리뷰를 신고했는지
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = false)
+    @JoinColumn(
+            name = "review_id",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "fk_report_review_id",
+                    foreignKeyDefinition = "FOREIGN KEY (review_id) REFERENCES book_reviews(id) ON DELETE CASCADE"
+            )
+    )
     private BookReviewEntity review;
+
 
 
     // 신고 사유

@@ -29,8 +29,16 @@ public class BookReviewLikeEntity {
 
     //좋아요 누른 리뷰
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id", nullable = false)
+    @JoinColumn(
+            name = "review_id",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "fk_like_review_id",
+                    foreignKeyDefinition = "FOREIGN KEY (review_id) REFERENCES book_reviews(id) ON DELETE CASCADE"
+            )
+    )
     private BookReviewEntity review;
+
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
