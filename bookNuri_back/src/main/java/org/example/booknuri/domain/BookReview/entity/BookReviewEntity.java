@@ -53,7 +53,7 @@ public class BookReviewEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    //활성화 여부
+    //활성화 여부(신고로 인해 리뷰 비활성화될수도있음)
     private boolean isActive;
 
     // ❤️ 좋아요 수 (캐시용, 기본값 0)

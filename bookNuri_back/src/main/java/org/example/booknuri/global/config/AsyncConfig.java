@@ -22,9 +22,9 @@ public class AsyncConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         executor.setCorePoolSize(10);       // 동시에 10개 처리
-        executor.setMaxPoolSize(15);        // 최대 15개까지 확장
+        executor.setMaxPoolSize(17);        // 최대 17개까지 확장
         executor.setQueueCapacity(100);     // 대기열 100개
-        executor.setThreadNamePrefix("Library-");
+        executor.setThreadNamePrefix("Async-LogSaver-");
 
         //  만약 큐도 꽉 찼고 스레드도 꽉 찼다면?
         //  이때 그냥 에러내는 게 아니라, "요청한 스레드가 직접 실행"하게 함

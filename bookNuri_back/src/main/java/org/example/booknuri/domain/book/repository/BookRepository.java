@@ -9,4 +9,10 @@ import java.util.Optional;
 @Repository
 public interface BookRepository extends JpaRepository<BookEntity, Long> {
     Optional<BookEntity> findByIsbn13(String isbn13);
+
+
+
+
+    // Optional 없이 바로 반환!
+    BookEntity getByIsbn13(String isbn13);  // Optional 없이 바로 반환!
 }

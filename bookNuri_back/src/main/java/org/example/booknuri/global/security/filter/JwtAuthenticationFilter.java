@@ -1,13 +1,11 @@
 package org.example.booknuri.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.user.entity.UserEntity;
-import org.example.booknuri.domain.user.repository.UsersRepository;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.example.booknuri.global.security.dto.AuthenticationRequest;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.example.booknuri.global.security.provider.JwtProvider;
@@ -31,13 +29,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private final UsersRepository userRepository;
+    private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     //  생성자
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
                                    JwtProvider jwtProvider,
-                                   UsersRepository userRepository,
+                                   UserRepository userRepository,
                                    RedisTemplate<String, String> redisTemplate) {
         this.authenticationManager = authenticationManager;
         this.jwtProvider = jwtProvider;

@@ -3,13 +3,12 @@ package org.example.booknuri.global.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.user.repository.UsersRepository;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.example.booknuri.global.security.filter.JwtAuthenticationFilter;
 import org.example.booknuri.global.security.filter.JwtRequestFilter;
 import org.example.booknuri.global.security.provider.JwtProvider;
 import org.example.booknuri.global.security.service.UserDetailServiceImpl;
 import org.example.booknuri.global.security.service.CustomOAuth2UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,7 +37,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final  UserDetailServiceImpl userDetailService;
     private final JwtProvider jwtProvider;
-    private final UsersRepository userRepository;
+    private final UserRepository userRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
 

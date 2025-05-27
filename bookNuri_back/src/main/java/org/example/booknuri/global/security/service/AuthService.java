@@ -2,7 +2,7 @@ package org.example.booknuri.global.security.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.user.entity.UserEntity;
-import org.example.booknuri.domain.user.repository.UsersRepository;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.example.booknuri.global.security.converter.UserJoinConverter;
 import org.example.booknuri.global.security.dto.SignupRequestDTO;
 import org.example.booknuri.global.security.provider.JwtProvider;
@@ -23,7 +23,7 @@ public class AuthService {
 
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, String> redisTemplate;
-    private final UsersRepository userRepository;
+    private final UserRepository userRepository;
     private final UserJoinConverter userConverter;
 
 

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.global.security.provider.JwtProvider;
-import org.example.booknuri.domain.user.repository.UsersRepository;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    private final UsersRepository userRepository;
+    private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final HttpServletResponse response;
     private final RedisTemplate<String, String> redisTemplate;

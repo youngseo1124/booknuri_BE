@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.example.booknuri.domain.user.entity.UserEntity;
 
-import org.example.booknuri.domain.user.repository.UsersRepository;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailServiceImpl implements UserDetailsService {
 
-    private final UsersRepository usersRepository;
+    private final UserRepository usersRepository;
 
 
     // loadUserByUsername: 시큐리티 기본 메서드. 이름 고정됨 String만 매개변수로 받음

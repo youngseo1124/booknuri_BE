@@ -29,11 +29,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.library.entity.LibraryEntity;
 import org.example.booknuri.domain.library.repository.LibraryRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
-import org.example.booknuri.domain.user.repository.UsersRepository;
-import org.example.booknuri.global.security.provider.JwtProvider;
+import org.example.booknuri.domain.user.repository.UserRepository;
 
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -41,7 +38,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
 
-    private final UsersRepository usersRepository; // UsersRepository 의존성 주입
+    private final UserRepository usersRepository; // UserRepository 의존성 주입
 
     private final LibraryRepository libraryRepository;
 

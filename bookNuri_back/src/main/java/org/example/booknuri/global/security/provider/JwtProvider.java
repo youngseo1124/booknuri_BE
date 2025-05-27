@@ -154,7 +154,6 @@ public class JwtProvider {
 
 
 
-            log.info("parsedToken:" + parsedToken);
 
 
             // 사용자 아이디(유저네임)
@@ -201,7 +200,6 @@ public class JwtProvider {
         try{
             Jws<Claims> claims= Jwts.parser().verifyWith(getShaKey()).build().parseSignedClaims(jwt);
             Date expiration = claims.getBody().getExpiration();
-            log.info("만료기간:" + expiration.toString());
             //만료날짜인 expiration과 현재오늘 날짜 비교하기
             //날짜a.after(날짜b): 날짜a가 날짜b보다 더 뒤에 있으면 true
             boolean result=expiration.after(new Date()); //만료안됐으면 true임
