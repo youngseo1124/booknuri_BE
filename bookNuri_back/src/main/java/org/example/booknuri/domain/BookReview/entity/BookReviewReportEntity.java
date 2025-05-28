@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.booknuri.domain.user.entity.UserEntity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -49,5 +50,5 @@ public class BookReviewReportEntity {
     //  신고 일시
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date reportedAt;
+    private LocalDateTime reportedAt;
 }

@@ -4,6 +4,8 @@ package org.example.booknuri.domain.BookReview.repository;
 import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,11 +20,19 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     boolean existsByUserAndBook(UserEntity user, BookEntity book);
 
 
-    //유저가 쓴 리뷰  찾기
-    List<BookReviewEntity> findByUser(UserEntity user);
+    //유저가 쓴 리뷰  찾기(+페이지네이션)
+    Page<BookReviewEntity> findByUser(UserEntity user, Pageable pageable);
+
 
     //특정 책에 대해 유저가 쓴 리뷰 찾기
     Optional<BookReviewEntity> findByIdAndUser(Long id, UserEntity user);
+
+    //특정책에 대해 활성화T상태인 리뷰들 (페이지네이션 O)
+    Page<BookReviewEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13, Pageable pageable);
+
+
+
+
 
 
 }

@@ -17,4 +17,5 @@ public class BookReviewUpdateRequestDto {
     private Long reviewId;
     private String content;
     private int rating;
+    private boolean containsSpoiler;
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -47,11 +48,15 @@ public class BookReviewEntity {
     // 리뷰 작성 시간
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     //  리뷰 수정 시간
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
+
+    // 스포일러 여부 (기본 false)
+    @Column(nullable = false)
+    private boolean containsSpoiler;
 
     //활성화 여부(신고로 인해 리뷰 비활성화될수도있음)
     private boolean isActive;
@@ -71,10 +76,10 @@ public class BookReviewEntity {
     }
 
     //리뷰 수정 메서드
-    public void updateReview(String content, int rating) {
+    public void updateReview(String content, int rating, boolean containsSpoiler) {
         this.content = content;
         this.rating = rating;
-        this.updatedAt = new Date(); // 수정 시간도 업데이트
+        this.containsSpoiler = containsSpoiler;
+        this.updatedAt = LocalDateTime.now();
     }
-
 }

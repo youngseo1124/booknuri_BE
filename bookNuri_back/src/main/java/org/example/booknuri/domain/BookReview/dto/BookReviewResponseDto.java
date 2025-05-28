@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -16,7 +17,11 @@ public class BookReviewResponseDto {
     private String content;
     private int rating;
     private String reviewerUsername;
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private int likeCount;
     private boolean isLikedByCurrentUser;
+    private boolean containsSpoiler;
+    //내가 쓴 리뷰인지 여부
+    private boolean isWrittenByCurrentUser;
 }

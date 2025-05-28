@@ -2,9 +2,11 @@ package org.example.booknuri.domain.BookReview.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.booknuri.domain.BookReview.converter.MyReviewConverter;
 import org.example.booknuri.domain.BookReview.dto.BookReviewCreateRequestDto;
 import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
 import org.example.booknuri.domain.BookReview.dto.BookReviewUpdateRequestDto;
+import org.example.booknuri.domain.BookReview.dto.MyReviewResponseDto;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
@@ -14,9 +16,14 @@ import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.book.service.BookService;
 import org.example.booknuri.domain.BookReview.converter.BookReviewConverter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +36,7 @@ public class BookReviewService {
     private final BookRepository bookRepository;
     private final BookService bookService;
     private final BookReviewConverter bookReviewConverter;
+    private final MyReviewConverter myReviewConverter;
 
     //리뷰 쓰기 로직
     public BookTotalInfoDto createReview(BookReviewCreateRequestDto dto, UserEntity user) {
@@ -43,15 +51,7 @@ public class BookReviewService {
         }
 
         // 3. 리뷰 생성 및 저장
-        BookReviewEntity review = BookReviewEntity.builder()
-                .book(book)
-                .user(user)
-                .content(dto.getContent())
-                .rating(dto.getRating())
-                .createdAt(new Date())
-                .isActive(true)
-                .likeCount(0)
-                .build();
+        BookReviewEntity review = bookReviewConverter.toEntity(dto, book, user);
 
         bookReviewRepository.save(review);
 
@@ -72,14 +72,25 @@ public class BookReviewService {
         BookReviewEntity review = bookReviewRepository.findByIdAndUser(dto.getReviewId(), user)
                 .orElseThrow(() -> new IllegalArgumentException("리뷰를 찾을 수 없습니다."));
 
-        review.updateReview(dto.getContent(), dto.getRating());
+        review.updateReview(dto.getContent(), dto.getRating(),dto.isContainsSpoiler());
     }
 
-    // 내가 쓴 리뷰 목록
-    public List<BookReviewResponseDto> getMyReviews(UserEntity user) {
-        List<BookReviewEntity> reviews = bookReviewRepository.findByUser(user);
-        return bookReviewConverter.toDtoList(reviews, user);
+    //내가 쓴 리뷰 (책 정보 포함된 MyReviewResponseDto로 변경)
+    public List<MyReviewResponseDto> getMyReviews(UserEntity user, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        // Page 객체로 받아오기
+        Page<BookReviewEntity> page = bookReviewRepository.findByUser(user, pageable);
+
+        // 리스트 추출
+        List<BookReviewEntity> reviews = page.getContent();
+
+        // 책 정보까지 포함된 DTO로 변환해서 반환
+        return myReviewConverter.toDtoList(reviews, user);
     }
+
+
+
 
     // 리뷰 삭제
     public void deleteReview(Long reviewId, UserEntity user) {
@@ -87,6 +98,25 @@ public class BookReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 리뷰가 없습니다."));
         bookReviewRepository.delete(review);
     }
+
+
+    //특정책에 대해한 리뷰들 불러오기(정렬 필터링 선택가능)
+    public List<BookReviewResponseDto> getReviewsByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
+        Page<BookReviewEntity> page = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);
+        List<BookReviewEntity> reviews = page.getContent();
+        return bookReviewConverter.toDtoList(reviews, currentUser);
+    }
+
+    private Sort getSortOrder(String sort) {
+        return switch (sort.toLowerCase()) {
+            case "like" -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case "high" -> Sort.by(Sort.Direction.DESC, "rating");
+            case "low" -> Sort.by(Sort.Direction.ASC, "rating");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+    }
+
 
 
 }

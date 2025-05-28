@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.BookReview.dto.BookReviewCreateRequestDto;
 import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
 import org.example.booknuri.domain.BookReview.dto.BookReviewUpdateRequestDto;
+import org.example.booknuri.domain.BookReview.dto.MyReviewResponseDto;
 import org.example.booknuri.domain.BookReview.service.BookReviewService;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -68,10 +69,29 @@ public class BookReviewController {
 
     //내가 쓴 리뷰
     @GetMapping("/my")
-    public List<BookReviewResponseDto> getMyReviews(@AuthenticationPrincipal CustomUser currentUser) {
+    public List<MyReviewResponseDto> getMyReviews(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit
+    ) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        return bookReviewService.getMyReviews(user);
+        return bookReviewService.getMyReviews(user, offset, limit);
     }
+
+    // 특정 책의 모든 리뷰 조회 (정렬 + 페이지네이션)
+    @GetMapping("/list/{isbn13}")
+    public List<BookReviewResponseDto> getAllReviewsForBook(
+            @PathVariable String isbn13,
+            @RequestParam(defaultValue = "new") String sort,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit,
+            @AuthenticationPrincipal CustomUser currentUser
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        return bookReviewService.getReviewsByBook(isbn13, sort, offset, limit, user);
+    }
+
+
 
 
 }
