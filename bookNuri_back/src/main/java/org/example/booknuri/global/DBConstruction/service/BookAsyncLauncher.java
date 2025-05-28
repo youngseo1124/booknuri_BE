@@ -32,7 +32,7 @@ public class BookAsyncLauncher {
         daeguLibraries = daeguLibraries.stream()
                 .filter(lib -> lib.getBookCount() != null) //  null인 도서관 제외!
                 .sorted(Comparator.comparingInt(LibraryEntity::getBookCount)) // 도서 수 오름차순
-                .skip(9) // 상위 10개 건너뛰고
+                .skip(18) // 상위 10개 건너뛰고
                 .limit(9) // 다음 10개 가져오기
                 .toList();
 
@@ -42,8 +42,7 @@ public class BookAsyncLauncher {
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (LibraryEntity lib : daeguLibraries) {
-            log.info("🔥 비동기 호출됨: {}", lib.getLibName());
-            futures.add(processorService.processLibraryBooksAsync(lib));
+            log.info("🔥 비동기 호출됨: {}", lib.getLibName());            futures.add(processorService.processLibraryBooksAsync(lib));
         }
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();

@@ -70,4 +70,11 @@ public class BookReviewEntity {
         if (this.likeCount > 0) this.likeCount--;
     }
 
+    //리뷰 수정 메서드
+    public void updateReview(String content, int rating) {
+        this.content = content;
+        this.rating = rating;
+        this.updatedAt = new Date(); // 수정 시간도 업데이트
+    }
+
 }

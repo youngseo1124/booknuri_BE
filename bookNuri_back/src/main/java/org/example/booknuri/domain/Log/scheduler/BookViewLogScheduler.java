@@ -29,9 +29,9 @@ public class BookViewLogScheduler {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
-    //10분마다 실행되는 스케줄러(지금은 1분으로 해둠)
+    //10분마다 실행되는 스케줄러
     //Redis에 쌓인 조회 로그를 MySQL로 저장
-    @Scheduled(fixedDelay = 1 * 60 * 1000)
+    @Scheduled(fixedDelay = 10 * 60 * 1000)
     @Transactional
     public void syncBookViewLogs() {
         log.info("📚 [BookViewLogScheduler] Redis → DB 저장 시작");
