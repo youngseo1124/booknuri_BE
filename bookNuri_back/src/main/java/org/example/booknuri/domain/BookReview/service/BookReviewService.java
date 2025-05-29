@@ -37,6 +37,18 @@ public class BookReviewService {
     private final BookReviewConverter bookReviewConverter;
     private final MyReviewConverter myReviewConverter;
 
+
+
+    //내가 이미 이 책에 리뷰썼는지 아닌지 확인(이미 썼으면 T, 아직 안썻으면 F반환)
+    public boolean checkAlreadyReviewed(String isbn13, UserEntity user) {
+        BookEntity book = bookRepository.findByIsbn13(isbn13)
+                .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
+        return bookReviewRepository.existsByUserAndBook(user, book);
+    }
+
+
+
+
     //리뷰 쓰기 로직
     public void createReview(BookReviewCreateRequestDto dto, UserEntity user) {
         // 1. 책 조회
@@ -107,6 +119,7 @@ public class BookReviewService {
         };
     }
 
+    //리뷰 별점 분포
     public BookReviewListResponseDto getReviewsSummaryByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
         Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
         Page<BookReviewEntity> page = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);

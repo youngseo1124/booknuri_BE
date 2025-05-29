@@ -25,6 +25,19 @@ public class BookReviewController {
     private final UserService userService;
 
 
+    //리뷰 썼는지 안썻는지 확인용
+    @GetMapping("/exist/{isbn13}")
+    public ResponseEntity<?> checkIfAlreadyReviewed(
+            @PathVariable String isbn13,
+            @AuthenticationPrincipal CustomUser currentUser
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        boolean alreadyReviewed = bookReviewService.checkAlreadyReviewed(isbn13, user);
+        return ResponseEntity.ok(Map.of("alreadyReviewed", alreadyReviewed));
+    }
+
+
+
     //리뷰작성
     @PostMapping
     public ResponseEntity<?> createBookReview(@RequestBody BookReviewCreateRequestDto dto,
