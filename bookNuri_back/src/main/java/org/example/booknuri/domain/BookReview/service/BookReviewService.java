@@ -3,10 +3,7 @@ package org.example.booknuri.domain.BookReview.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.BookReview.converter.MyReviewConverter;
-import org.example.booknuri.domain.BookReview.dto.BookReviewCreateRequestDto;
-import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
-import org.example.booknuri.domain.BookReview.dto.BookReviewUpdateRequestDto;
-import org.example.booknuri.domain.BookReview.dto.MyReviewResponseDto;
+import org.example.booknuri.domain.BookReview.dto.*;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
@@ -25,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Service
@@ -39,7 +38,7 @@ public class BookReviewService {
     private final MyReviewConverter myReviewConverter;
 
     //리뷰 쓰기 로직
-    public BookTotalInfoDto createReview(BookReviewCreateRequestDto dto, UserEntity user) {
+    public void createReview(BookReviewCreateRequestDto dto, UserEntity user) {
         // 1. 책 조회
         BookEntity book = bookRepository.findByIsbn13(dto.getIsbn13())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ISBN의 책이 존재하지 않습니다."));
@@ -52,18 +51,9 @@ public class BookReviewService {
 
         // 3. 리뷰 생성 및 저장
         BookReviewEntity review = bookReviewConverter.toEntity(dto, book, user);
-
         bookReviewRepository.save(review);
-
-        // 4. 책 정보 + 리뷰 리스트 묶어서 리턴
-        BookInfoResponseDto bookInfo = bookService.getBookDetailByIsbn(dto.getIsbn13());
-        List<BookReviewEntity> allReviews = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(dto.getIsbn13());
-
-        return BookTotalInfoDto.builder()
-                .bookInfo(bookInfo)
-                .reviews(bookReviewConverter.toDtoList(allReviews, user))
-                .build();
     }
+
 
 
 
@@ -116,6 +106,48 @@ public class BookReviewService {
             default -> Sort.by(Sort.Direction.DESC, "createdAt");
         };
     }
+
+    public BookReviewListResponseDto getReviewsSummaryByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
+        Page<BookReviewEntity> page = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);
+        List<BookReviewEntity> reviews = page.getContent();
+
+        // 평균 별점 계산
+        Double avg = bookReviewRepository.getAverageReviewRatingByIsbn13(isbn13);
+        double averageRating = avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0;
+
+        //  별점 분포 계산
+        List<BookReviewEntity> all = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13); // 전체 불러옴
+        Map<Integer, Integer> ratingDistribution = getRatingBuckets(all);
+
+        //  변환
+        List<BookReviewResponseDto> dtos = bookReviewConverter.toDtoList(reviews, currentUser);
+
+        return BookReviewListResponseDto.builder()
+                .averageRating(averageRating)
+                .ratingDistribution(ratingDistribution)
+                .reviews(dtos)
+                .build();
+    }
+
+    //별점 분포 로직
+    private Map<Integer, Integer> getRatingBuckets(List<BookReviewEntity> reviews) {
+        Map<Integer, Integer> map = new HashMap<>();
+        int[] keys = {10, 8, 6, 4, 2};
+
+        for (int key : keys) {
+            map.put(key, 0); // 기본 0으로 초기화
+        }
+
+        for (BookReviewEntity r : reviews) {
+            int rounded = (int) Math.ceil(r.getRating() / 2.0) * 2; // 1~10 => 2단위 버킷
+            rounded = Math.min(10, Math.max(2, rounded)); // 예외 방지
+            map.put(rounded, map.getOrDefault(rounded, 0) + 1);
+        }
+
+        return map;
+    }
+
 
 
 

@@ -19,10 +19,6 @@ public class BookTotalInfoDto {
 
     private BookInfoResponseDto bookInfo;                 // 기본 책 정보 (Redis에서)
 
-    //  리뷰 정보
-    private List<BookReviewResponseDto> reviews;
-
-    // 나중에 추가될 콘텐츠들
-    // private List<BookQuoteDto> quotes;                // 인용문
-    // private List<BookEssayDto> essays;                // 독후감
+    // 내 책장에 담겼는지 여부
+    private boolean addedToBookshelf;
 }

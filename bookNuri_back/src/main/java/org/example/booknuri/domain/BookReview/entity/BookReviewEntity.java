@@ -31,7 +31,7 @@ public class BookReviewEntity {
     @Column(length = 1000, nullable = false)
     private String content;
 
-    // ⭐ 별점 (1~5점)
+    // ⭐ 별점 (1~10점)
     @Column(nullable = false)
     private int rating;
 

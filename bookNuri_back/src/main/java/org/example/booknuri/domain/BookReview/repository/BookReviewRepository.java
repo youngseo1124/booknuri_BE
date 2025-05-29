@@ -7,6 +7,8 @@ import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,13 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     Page<BookReviewEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13, Pageable pageable);
 
 
+
+    @Query("SELECT AVG(r.rating) FROM BookReviewEntity r WHERE r.book.isbn13 = :isbn13 AND r.isActive = true")
+    Double getAverageReviewRatingByIsbn13(@Param("isbn13") String isbn13);
+
+
+    // 리뷰 개수 조회 (isActive = true인 것만)
+    int countByBook_Isbn13AndIsActiveTrue(String isbn13);
 
 
 

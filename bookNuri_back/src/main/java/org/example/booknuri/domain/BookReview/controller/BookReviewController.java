@@ -2,10 +2,7 @@ package org.example.booknuri.domain.BookReview.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.BookReview.dto.BookReviewCreateRequestDto;
-import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
-import org.example.booknuri.domain.BookReview.dto.BookReviewUpdateRequestDto;
-import org.example.booknuri.domain.BookReview.dto.MyReviewResponseDto;
+import org.example.booknuri.domain.BookReview.dto.*;
 import org.example.booknuri.domain.BookReview.service.BookReviewService;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -28,23 +25,22 @@ public class BookReviewController {
     private final UserService userService;
 
 
+    //리뷰작성
     @PostMapping
     public ResponseEntity<?> createBookReview(@RequestBody BookReviewCreateRequestDto dto,
                                               @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
 
         try {
-            BookTotalInfoDto result = bookReviewService.createReview(dto, user);
-            return ResponseEntity.ok(result);
+            bookReviewService.createReview(dto, user);
+            return ResponseEntity.ok(Map.of("message", "리뷰 작성 완료!"));
         } catch (IllegalStateException e) {
-            // 이미 리뷰 작성했을 경우
-            // "message": "이미 이 책에 리뷰를 작성하셨습니다."
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (IllegalArgumentException e) {
-            // 책 없음 등
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
+
 
 
 
@@ -80,7 +76,7 @@ public class BookReviewController {
 
     // 특정 책의 모든 리뷰 조회 (정렬 + 페이지네이션)
     @GetMapping("/list/{isbn13}")
-    public List<BookReviewResponseDto> getAllReviewsForBook(
+    public BookReviewListResponseDto getAllReviewsForBook(
             @PathVariable String isbn13,
             @RequestParam(defaultValue = "new") String sort,
             @RequestParam(defaultValue = "0") int offset,
@@ -88,8 +84,9 @@ public class BookReviewController {
             @AuthenticationPrincipal CustomUser currentUser
     ) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        return bookReviewService.getReviewsByBook(isbn13, sort, offset, limit, user);
+        return bookReviewService.getReviewsSummaryByBook(isbn13, sort, offset, limit, user);
     }
+
 
 
 

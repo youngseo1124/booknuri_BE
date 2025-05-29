@@ -4,8 +4,11 @@ import org.example.booknuri.domain.BookReview.converter.BookReviewConverter;
 import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
 import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
 import org.example.booknuri.domain.BookReview.repository.BookReviewRepository;
+import org.example.booknuri.domain.BookReview.service.BookReviewService;
 import org.example.booknuri.domain.Log.service.BookViewLogService;
 import org.example.booknuri.domain.Log.service.UserBookViewLogService;
+import org.example.booknuri.domain.MyBookshelf.entity.MyBookshelfEntity;
+import org.example.booknuri.domain.MyBookshelf.repository.MyBookshelfRepository;
 import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
@@ -41,6 +44,8 @@ public class BookController {
     private final BookViewLogService bookViewLogService;
     private final UserService userService;
     private final UserBookViewLogService userBookViewLogService;
+    private final BookReviewService bookReviewService;
+    private final MyBookshelfRepository myBookshelfRepository;
 
 
     @GetMapping("/{isbn13}")
@@ -48,37 +53,35 @@ public class BookController {
                                            @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
 
-
         try {
             // 0. ISBN 존재 검사
             BookEntity bookEntity = bookService.getBookEntityByIsbn(isbn13);
 
-            // 최근 본 책 로그 저장
+            // 1. 최근 본 책 로그 저장
             userBookViewLogService.saveRecentView(user, bookEntity);
 
-            // 1. 책 정보 (캐시 or DB)
+            // 2. 책 정보
             BookInfoResponseDto bookInfo = bookService.getBookDetailByIsbn(isbn13);
 
-            // 2. 리뷰 정보
-            List<BookReviewEntity> reviews = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13);
-            List<BookReviewResponseDto> reviewDtos = bookReviewConverter.toDtoList(reviews,user);
+            // 3. 내가 책장에 담았는지 여부 확인
+            boolean isAdded = myBookshelfRepository.existsByUserAndBook(user, bookEntity);
 
-            // 3. 비동기 로그 저장
+            // 4. 로그 저장
             bookViewLogService.logBookView(user, bookEntity);
 
-            // 4. 최종 응답
+            // 5. 응답 반환
             return ResponseEntity.ok(
                     BookTotalInfoDto.builder()
                             .bookInfo(bookInfo)
-                            .reviews(reviewDtos)
+                            .addedToBookshelf(isAdded)
                             .build()
             );
 
         } catch (IllegalArgumentException e) {
-            // ISBN이 잘못된 경우
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
 
 
