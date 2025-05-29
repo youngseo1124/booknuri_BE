@@ -66,6 +66,19 @@ public class BookReviewService {
         bookReviewRepository.save(review);
     }
 
+    //리뷰 수정화면에서 기존 특정책에 대한 내 리뷰 가져올떄 쓰는 서비스
+    public BookReviewResponseDto getMyReviewForBook(String isbn13, UserEntity user) {
+        BookEntity book = bookRepository.findByIsbn13(isbn13)
+                .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
+
+        BookReviewEntity review = bookReviewRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new IllegalArgumentException("작성한 리뷰가 없습니다."));
+
+        return bookReviewConverter.toDto(review, user);
+    }
+
+
+
 
 
 
@@ -77,7 +90,7 @@ public class BookReviewService {
         review.updateReview(dto.getContent(), dto.getRating(),dto.isContainsSpoiler());
     }
 
-    //내가 쓴 리뷰 (책 정보 포함된 MyReviewResponseDto로 변경)
+    //내가 쓴 리뷰들 (책 정보 포함된 MyReviewResponseDto로 변경)
     public List<MyReviewResponseDto> getMyReviews(UserEntity user, int offset, int limit) {
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
 

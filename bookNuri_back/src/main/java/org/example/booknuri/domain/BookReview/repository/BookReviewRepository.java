@@ -26,8 +26,12 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     Page<BookReviewEntity> findByUser(UserEntity user, Pageable pageable);
 
 
-    //특정 책에 대해 유저가 쓴 리뷰 찾기
+    //특정 책에 대해 유저가 쓴 리뷰 찾기(리뷰아이디로)
     Optional<BookReviewEntity> findByIdAndUser(Long id, UserEntity user);
+
+    //특정 책에 대해 유저가 쓴 리뷰 찾기(북엔티티로)
+    Optional<BookReviewEntity> findByUserAndBook(UserEntity user, BookEntity book);
+
 
     //특정책에 대해 활성화T상태인 리뷰들 (페이지네이션 O)
     Page<BookReviewEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13, Pageable pageable);

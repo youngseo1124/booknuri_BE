@@ -54,6 +54,16 @@ public class BookReviewController {
         }
     }
 
+    // 리뷰 수정할떄 기존 리뷰 불러오기
+    @GetMapping("/my/{isbn13}")
+    public ResponseEntity<?> getMyReviewForBook(@PathVariable String isbn13,
+                                                @AuthenticationPrincipal CustomUser currentUser) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        BookReviewResponseDto dto = bookReviewService.getMyReviewForBook(isbn13, user);
+        return ResponseEntity.ok(dto);
+    }
+
+
 
 
 
