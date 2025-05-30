@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReflection.dto;
+package org.example.booknuri.domain.bookReflection_.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

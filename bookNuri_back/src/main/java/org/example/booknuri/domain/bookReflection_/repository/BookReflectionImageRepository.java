@@ -1,7 +1,7 @@
-package org.example.booknuri.domain.BookReflection.repository;
+package org.example.booknuri.domain.bookReflection_.repository;
 
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionImageEntity;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReflection.dto;
+package org.example.booknuri.domain.bookReflection_.dto;
 
 // 독후감 업데이트 용 dto
 

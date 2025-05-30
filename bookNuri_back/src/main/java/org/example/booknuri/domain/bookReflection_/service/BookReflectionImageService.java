@@ -1,9 +1,9 @@
-package org.example.booknuri.domain.BookReflection.service;
+package org.example.booknuri.domain.bookReflection_.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionImageEntity;
-import org.example.booknuri.domain.BookReflection.repository.BookReflectionImageRepository;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionImageEntity;
+import org.example.booknuri.domain.bookReflection_.repository.BookReflectionImageRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

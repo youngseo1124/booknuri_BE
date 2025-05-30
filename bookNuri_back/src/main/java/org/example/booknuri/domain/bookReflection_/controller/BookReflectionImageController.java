@@ -1,11 +1,11 @@
-package org.example.booknuri.domain.BookReflection.controller;
+package org.example.booknuri.domain.bookReflection_.controller;
 
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
-import org.example.booknuri.domain.BookReflection.repository.BookReflectionRepository;
-import org.example.booknuri.domain.BookReflection.service.BookReflectionImageService;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection_.repository.BookReflectionRepository;
+import org.example.booknuri.domain.bookReflection_.service.BookReflectionImageService;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.user.service.UserService;
 import org.example.booknuri.global.imageUpload.S3Uploader;
