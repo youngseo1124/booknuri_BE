@@ -94,8 +94,14 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
 
-    // ✅ OAuth2 클라이언트 (카카오 로그인)
+    // OAuth2 클라이언트 (카카오 로그인)
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+
+    //s3의존성 추가
+    implementation 'software.amazon.awssdk:s3:2.25.16'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
 }
 
 tasks.named('test') {
