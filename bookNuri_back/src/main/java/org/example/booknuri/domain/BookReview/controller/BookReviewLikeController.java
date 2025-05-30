@@ -1,7 +1,7 @@
-package org.example.booknuri.domain.BookReview.controller;
+package org.example.booknuri.domain.bookReview.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReview.service.BookReviewLikeService;
+import org.example.booknuri.domain.bookReview.service.BookReviewLikeService;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

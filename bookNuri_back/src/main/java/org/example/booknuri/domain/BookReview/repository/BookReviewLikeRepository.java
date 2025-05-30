@@ -1,8 +1,8 @@
-package org.example.booknuri.domain.BookReview.repository;
+package org.example.booknuri.domain.bookReview.repository;
 
 
-import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
-import org.example.booknuri.domain.BookReview.entity.BookReviewLikeEntity;
+import org.example.booknuri.domain.bookReview.entity.BookReviewEntity;
+import org.example.booknuri.domain.bookReview.entity.BookReviewLikeEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

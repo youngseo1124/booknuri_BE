@@ -1,7 +1,7 @@
-package org.example.booknuri.domain.BookReflection.controller;
+package org.example.booknuri.domain.bookReflection.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReflection.service.BookReflectionLikeService;
+import org.example.booknuri.domain.bookReflection.service.BookReflectionLikeService;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

@@ -1,18 +1,16 @@
-package org.example.booknuri.domain.BookReview.service;
+package org.example.booknuri.domain.bookReview.service;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReview.converter.MyReviewConverter;
-import org.example.booknuri.domain.BookReview.dto.*;
-import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
-import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
+import org.example.booknuri.domain.bookReview.converter.MyReviewConverter;
+import org.example.booknuri.domain.bookReview.dto.*;
 import org.example.booknuri.domain.book.entity.BookEntity;
-import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
-import org.example.booknuri.domain.BookReview.repository.BookReviewRepository;
+import org.example.booknuri.domain.bookReview.entity.BookReviewEntity;
+import org.example.booknuri.domain.bookReview.repository.BookReviewRepository;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.book.service.BookService;
-import org.example.booknuri.domain.BookReview.converter.BookReviewConverter;
+import org.example.booknuri.domain.bookReview.converter.BookReviewConverter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

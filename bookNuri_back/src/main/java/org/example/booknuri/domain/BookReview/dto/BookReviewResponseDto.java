@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReview.dto;
+package org.example.booknuri.domain.bookReview.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor

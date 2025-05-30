@@ -1,11 +1,10 @@
-package org.example.booknuri.domain.BookReview.entity;
+package org.example.booknuri.domain.bookReview.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.booknuri.domain.user.entity.UserEntity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter

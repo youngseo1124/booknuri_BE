@@ -1,10 +1,9 @@
-package org.example.booknuri.domain.BookReview.controller;
+package org.example.booknuri.domain.bookReview.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.BookReview.dto.*;
-import org.example.booknuri.domain.BookReview.service.BookReviewService;
-import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
+import org.example.booknuri.domain.bookReview.dto.*;
+import org.example.booknuri.domain.bookReview.service.BookReviewService;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.user.service.UserService;
 import org.example.booknuri.global.security.entity.CustomUser;

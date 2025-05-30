@@ -1,10 +1,10 @@
-package org.example.booknuri.domain.BookReflection.converter;
+package org.example.booknuri.domain.bookReflection.converter;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReflection.dto.BookReflectionCreateRequestDto;
-import org.example.booknuri.domain.BookReflection.dto.BookReflectionResponseDto;
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
-import org.example.booknuri.domain.BookReflection.repository.BookReflectionLikeRepository;
+import org.example.booknuri.domain.bookReflection.dto.BookReflectionCreateRequestDto;
+import org.example.booknuri.domain.bookReflection.dto.BookReflectionResponseDto;
+import org.example.booknuri.domain.bookReflection.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection.repository.BookReflectionLikeRepository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.stereotype.Component;

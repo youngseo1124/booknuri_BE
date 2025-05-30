@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReflection.dto;
+package org.example.booknuri.domain.bookReflection.dto;
 
 // 내가 쓴 독후감 보기
 

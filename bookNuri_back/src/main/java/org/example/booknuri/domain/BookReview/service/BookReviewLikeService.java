@@ -1,10 +1,10 @@
-package org.example.booknuri.domain.BookReview.service;
+package org.example.booknuri.domain.bookReview.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
-import org.example.booknuri.domain.BookReview.entity.BookReviewLikeEntity;
-import org.example.booknuri.domain.BookReview.repository.BookReviewLikeRepository;
-import org.example.booknuri.domain.BookReview.repository.BookReviewRepository;
+import org.example.booknuri.domain.bookReview.entity.BookReviewEntity;
+import org.example.booknuri.domain.bookReview.entity.BookReviewLikeEntity;
+import org.example.booknuri.domain.bookReview.repository.BookReviewLikeRepository;
+import org.example.booknuri.domain.bookReview.repository.BookReviewRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;

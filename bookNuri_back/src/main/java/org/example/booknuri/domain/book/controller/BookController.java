@@ -1,14 +1,11 @@
 package org.example.booknuri.domain.book.controller;
 
-import org.example.booknuri.domain.BookReview.converter.BookReviewConverter;
-import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
-import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
-import org.example.booknuri.domain.BookReview.repository.BookReviewRepository;
-import org.example.booknuri.domain.BookReview.service.BookReviewService;
+import org.example.booknuri.domain.bookReview.converter.BookReviewConverter;
+import org.example.booknuri.domain.bookReview.repository.BookReviewRepository;
+import org.example.booknuri.domain.bookReview.service.BookReviewService;
 import org.example.booknuri.domain.Log.service.BookViewLogService;
 import org.example.booknuri.domain.Log.service.UserBookViewLogService;
-import org.example.booknuri.domain.MyBookshelf.entity.MyBookshelfEntity;
-import org.example.booknuri.domain.MyBookshelf.repository.MyBookshelfRepository;
+import org.example.booknuri.domain.myBookshelf.repository.MyBookshelfRepository;
 import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
@@ -27,8 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

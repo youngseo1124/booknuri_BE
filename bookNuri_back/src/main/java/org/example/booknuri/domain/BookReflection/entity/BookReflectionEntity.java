@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReflection.entity;
+package org.example.booknuri.domain.bookReflection.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

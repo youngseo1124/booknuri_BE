@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReview.entity;
+package org.example.booknuri.domain.bookReview.entity;
 
 import jakarta.persistence.Entity;
 

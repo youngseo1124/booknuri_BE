@@ -1,6 +1,6 @@
-package org.example.booknuri.domain.MyBookshelf.repository;
+package org.example.booknuri.domain.myBookshelf.repository;
 
-import org.example.booknuri.domain.MyBookshelf.entity.MyBookshelfEntity;
+import org.example.booknuri.domain.myBookshelf.entity.MyBookshelfEntity;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

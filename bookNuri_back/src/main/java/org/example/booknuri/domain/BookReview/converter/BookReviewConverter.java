@@ -1,11 +1,10 @@
-package org.example.booknuri.domain.BookReview.converter;
+package org.example.booknuri.domain.bookReview.converter;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReview.dto.BookReviewCreateRequestDto;
-import org.example.booknuri.domain.BookReview.dto.BookReviewResponseDto;
-import org.example.booknuri.domain.BookReview.entity.BookReviewEntity;
-import org.example.booknuri.domain.BookReview.entity.BookReviewLikeEntity;
-import org.example.booknuri.domain.BookReview.repository.BookReviewLikeRepository;
+import org.example.booknuri.domain.bookReview.dto.BookReviewCreateRequestDto;
+import org.example.booknuri.domain.bookReview.dto.BookReviewResponseDto;
+import org.example.booknuri.domain.bookReview.entity.BookReviewEntity;
+import org.example.booknuri.domain.bookReview.repository.BookReviewLikeRepository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.stereotype.Component;

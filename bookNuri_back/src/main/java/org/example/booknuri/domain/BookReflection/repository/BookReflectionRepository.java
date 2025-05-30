@@ -1,6 +1,6 @@
-package org.example.booknuri.domain.BookReflection.repository;
+package org.example.booknuri.domain.bookReflection.repository;
 
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection.entity.BookReflectionEntity;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.domain.Page;

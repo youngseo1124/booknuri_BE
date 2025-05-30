@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReview.dto;
+package org.example.booknuri.domain.bookReview.dto;
 
 //내가 쓴 리뷰 보기
 

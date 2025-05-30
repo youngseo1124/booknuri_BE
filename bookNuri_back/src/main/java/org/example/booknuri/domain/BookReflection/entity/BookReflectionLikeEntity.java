@@ -1,8 +1,7 @@
-package org.example.booknuri.domain.BookReflection.entity;
+package org.example.booknuri.domain.bookReflection.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 
 import java.util.Date;
