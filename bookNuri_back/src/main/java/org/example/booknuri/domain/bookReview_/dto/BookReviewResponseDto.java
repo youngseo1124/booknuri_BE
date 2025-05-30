@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.BookReflection.dto;
+package org.example.booknuri.domain.bookReview_.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookReflectionResponseDto {
+public class BookReviewResponseDto {
     private Long id;
     private String content;
     private int rating;
@@ -20,9 +20,7 @@ public class BookReflectionResponseDto {
     private LocalDateTime updatedAt;
     private int likeCount;
     private boolean isLikedByCurrentUser;
-    //스포일러 여부
     private boolean containsSpoiler;
-    // 내가 쓴 독후감인지 여부
+    //내가 쓴 리뷰인지 여부
     private boolean isWrittenByCurrentUser;
-    private boolean visibleToPublic; //공개여부
 }

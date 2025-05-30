@@ -1,4 +1,4 @@
-package org.example.booknuri.domain.bookReflection.dto;
+package org.example.booknuri.domain.BookReflection.dto;
 
 import lombok.*;
 

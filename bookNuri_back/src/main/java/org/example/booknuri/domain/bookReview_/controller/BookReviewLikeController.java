@@ -1,7 +1,7 @@
-package org.example.booknuri.domain.BookReflection.controller;
+package org.example.booknuri.domain.bookReview_.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.booknuri.domain.BookReflection.service.BookReflectionLikeService;
+import org.example.booknuri.domain.bookReview_.service.BookReviewLikeService;
 import org.example.booknuri.global.security.entity.CustomUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,19 +14,19 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/book/reflection/like")
-public class BookReflectionLikeController {
+@RequestMapping("/book/review/like")
+public class BookReviewLikeController {
 
-    private final BookReflectionLikeService bookReflectionLikeService;
+    private final BookReviewLikeService bookReviewLikeService;
 
-    @PostMapping("/{reflectionId}")
+    @PostMapping("/{reviewId}")
     public ResponseEntity<Map<String, Object>> toggleLike(
-            @PathVariable Long reflectionId,
+            @PathVariable Long reviewId,
             @AuthenticationPrincipal CustomUser currentUser
     ) {
-        boolean liked = bookReflectionLikeService.toggleLike(reflectionId, currentUser.getUsername());
+        boolean liked = bookReviewLikeService.toggleLike(reviewId, currentUser.getUsername());
 
-        // 응답을 JSON 객체로 감싸서 보내기
+        //  응답을 JSON 객체로 감싸서 보내기
         return ResponseEntity.ok(Map.of("liked", liked));
     }
 }

@@ -1,9 +1,9 @@
-package org.example.booknuri.domain.bookReflection.controller;
+package org.example.booknuri.domain.BookReflection.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.bookReflection.dto.*;
-import org.example.booknuri.domain.bookReflection.service.BookReflectionService;
+import org.example.booknuri.domain.BookReflection.dto.*;
+import org.example.booknuri.domain.BookReflection.service.BookReflectionService;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.example.booknuri.domain.user.service.UserService;
 import org.example.booknuri.global.security.entity.CustomUser;

@@ -1,6 +1,6 @@
-package org.example.booknuri.domain.BookReflection.dto;
+package org.example.booknuri.domain.bookReview_.dto;
 
-// 독후감 업데이트 용 dto
+//리뷰 업데이트 용 dto
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookReflectionUpdateRequestDto {
-    private Long reflectionId;
+public class BookReviewUpdateRequestDto {
+    private Long reviewId;
     private String content;
     private int rating;
     private boolean containsSpoiler;
-    private boolean visibleToPublic; //공개여부
 }

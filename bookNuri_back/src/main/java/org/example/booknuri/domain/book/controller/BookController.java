@@ -1,11 +1,11 @@
 package org.example.booknuri.domain.book.controller;
 
-import org.example.booknuri.domain.bookReview.converter.BookReviewConverter;
-import org.example.booknuri.domain.bookReview.repository.BookReviewRepository;
-import org.example.booknuri.domain.bookReview.service.BookReviewService;
+import org.example.booknuri.domain.bookReview_.converter.BookReviewConverter;
+import org.example.booknuri.domain.bookReview_.repository.BookReviewRepository;
+import org.example.booknuri.domain.bookReview_.service.BookReviewService;
 import org.example.booknuri.domain.Log.service.BookViewLogService;
 import org.example.booknuri.domain.Log.service.UserBookViewLogService;
-import org.example.booknuri.domain.myBookshelf.repository.MyBookshelfRepository;
+import org.example.booknuri.domain.myBookshelf_.repository.MyBookshelfRepository;
 import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;

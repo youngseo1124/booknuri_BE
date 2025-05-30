@@ -1,12 +1,12 @@
-package org.example.booknuri.domain.bookReflection.service;
+package org.example.booknuri.domain.BookReflection.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.booknuri.domain.bookReflection.converter.BookReflectionConverter;
-import org.example.booknuri.domain.bookReflection.converter.MyReflectionConverter;
-import org.example.booknuri.domain.bookReflection.dto.*;
-import org.example.booknuri.domain.bookReflection.entity.BookReflectionEntity;
-import org.example.booknuri.domain.bookReflection.repository.BookReflectionRepository;
+import org.example.booknuri.domain.BookReflection.converter.BookReflectionConverter;
+import org.example.booknuri.domain.BookReflection.converter.MyReflectionConverter;
+import org.example.booknuri.domain.BookReflection.dto.*;
+import org.example.booknuri.domain.BookReflection.entity.BookReflectionEntity;
+import org.example.booknuri.domain.BookReflection.repository.BookReflectionRepository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.book.service.BookService;
