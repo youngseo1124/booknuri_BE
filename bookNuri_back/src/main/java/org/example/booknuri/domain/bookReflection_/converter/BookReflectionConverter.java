@@ -36,6 +36,7 @@ public class BookReflectionConverter {
 
         return BookReflectionResponseDto.builder()
                 .id(entity.getId())
+                .title(entity.getTitle())
                 .content(entity.getContent())
                 .rating(entity.getRating())
                 .reviewerUsername(entity.getUser().getUsername()) // 유저에서 닉네임 or username 가져오기
@@ -63,6 +64,7 @@ public class BookReflectionConverter {
         return BookReflectionEntity.builder()
                 .book(book)
                 .user(user)
+                .title(dto.getTitle())
                 .content(dto.getContent())
                 .rating(dto.getRating())
                 .createdAt(LocalDateTime.now())

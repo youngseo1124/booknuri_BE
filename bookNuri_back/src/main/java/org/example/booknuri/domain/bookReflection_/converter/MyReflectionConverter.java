@@ -21,6 +21,7 @@ public class MyReflectionConverter {
 
         return MyReflectionResponseDto.builder()
                 .reflectionId(entity.getId())                         // 독후감 ID
+                .title(entity.getTitle())                             //제목
                 .content(entity.getContent())                         // 독후감 내용
                 .rating(entity.getRating())                           // 별점
                 .createdAt(entity.getCreatedAt())                     // 작성일

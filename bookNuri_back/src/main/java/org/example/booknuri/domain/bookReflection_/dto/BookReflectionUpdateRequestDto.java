@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BookReflectionUpdateRequestDto {
     private Long reflectionId;
+    private String title;
     private String content;
     private int rating;
     private boolean containsSpoiler;

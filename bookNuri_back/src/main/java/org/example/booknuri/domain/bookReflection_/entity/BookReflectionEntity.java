@@ -24,6 +24,11 @@ public class BookReflectionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+   //독후감 제목
+    @Column(nullable = false, length = 100)
+    private String title;
+
+
     // 독후감 텍스트
     // 전체 내용 텍스트로
     @Lob

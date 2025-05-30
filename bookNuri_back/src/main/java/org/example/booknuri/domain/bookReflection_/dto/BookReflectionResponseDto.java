@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 public class BookReflectionResponseDto {
     private Long id;
+    private String title;
     private String content;
     private int rating;
     private String reviewerUsername;

@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class MyReflectionResponseDto {
 
     private Long reflectionId;        // 독후감 고유 ID
+    private String title;
     private String content;           // 독후감 내용
     private int rating;               // 별점
     private LocalDateTime createdAt;  // 작성일
