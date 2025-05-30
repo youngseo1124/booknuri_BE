@@ -22,3 +22,7 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Spring Boot 설정파일 무시
+src/main/resources/application.properties
+bookNuri_back/src/main/resources/application.properties
