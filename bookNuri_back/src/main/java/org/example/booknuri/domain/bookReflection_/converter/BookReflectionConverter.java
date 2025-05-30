@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.bookReflection_.dto.BookReflectionCreateRequestDto;
 import org.example.booknuri.domain.bookReflection_.dto.BookReflectionResponseDto;
 import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
+import org.example.booknuri.domain.bookReflection_.entity.BookReflectionImageEntity;
+import org.example.booknuri.domain.bookReflection_.repository.BookReflectionImageRepository;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionLikeRepository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -18,11 +20,20 @@ import java.util.stream.Collectors;
 public class BookReflectionConverter {
 
     private final BookReflectionLikeRepository bookReflectionLikeRepository;
+    private final BookReflectionImageRepository bookReflectionImageRepository;
 
     // 단일 변환
     public BookReflectionResponseDto toDto(BookReflectionEntity entity, UserEntity currentUser) {
         boolean isLiked = bookReflectionLikeRepository.existsByUserAndReflection(currentUser, entity);
         boolean isMine = entity.getUser().getUsername().equals(currentUser.getUsername()); // 내가 쓴 독후감인지 체크
+
+
+        //이미지 url리스트 추출
+        List<String> imageUrls = bookReflectionImageRepository.findByReflection(entity)
+                .stream()
+                .map(BookReflectionImageEntity::getImageUrl)
+                .collect(Collectors.toList());
+
         return BookReflectionResponseDto.builder()
                 .id(entity.getId())
                 .content(entity.getContent())
@@ -35,6 +46,7 @@ public class BookReflectionConverter {
                 .isWrittenByCurrentUser(isMine)
                 .containsSpoiler(entity.isContainsSpoiler())
                 .visibleToPublic(entity.isVisibleToPublic())
+                .imageUrls(imageUrls)
 
                 .build();
     }
@@ -58,6 +70,7 @@ public class BookReflectionConverter {
                 .likeCount(0)
                 .containsSpoiler(dto.isContainsSpoiler()) // 스포일러 여부도 포함
                 .visibleToPublic(dto.isVisibleToPublic())
+
                 .build();
     }
 }

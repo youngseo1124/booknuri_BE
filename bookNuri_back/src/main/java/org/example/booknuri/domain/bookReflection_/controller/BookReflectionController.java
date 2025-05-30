@@ -48,7 +48,7 @@ public class BookReflectionController {
         }
     }
 
-    // 독후감 수정화면용 - 기존 내 독후감 불러오기
+    // 특정 책에 대한 내 독후감 불러오기  (수정화면 불러오기용)
     @GetMapping("/my/{isbn13}")
     public ResponseEntity<?> getMyReflectionForBook(@PathVariable String isbn13,
                                                     @AuthenticationPrincipal CustomUser currentUser) {
@@ -90,9 +90,9 @@ public class BookReflectionController {
     @GetMapping("/list/{isbn13}")
     public BookReflectionListResponseDto getAllReflectionsForBook(
             @PathVariable String isbn13,
-            @RequestParam(defaultValue = "new") String sort,
+            @RequestParam(defaultValue = "like") String sort,
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "20") int limit,
+            @RequestParam(defaultValue = "10") int limit,
             @AuthenticationPrincipal CustomUser currentUser
     ) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());

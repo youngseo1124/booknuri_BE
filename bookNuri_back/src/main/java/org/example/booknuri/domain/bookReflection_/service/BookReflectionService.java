@@ -55,7 +55,7 @@ public class BookReflectionService {
         bookReflectionRepository.save(reflection);
     }
 
-    // 독후감 수정화면용: 내가 쓴 특정 책에 대한 독후감
+    // 독후감 수정화면용: 내가 쓴 특정 책에 대한 독후감 +이미지 가져와서 dto로 반환
     public BookReflectionResponseDto getMyReflectionForBook(String isbn13, UserEntity user) {
         BookEntity book = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
@@ -108,7 +108,7 @@ public class BookReflectionService {
         };
     }
 
-    // 독후감 요약 (평점, 분포 포함)
+    // 특정 책에 대한 독후감들 반환(ㅠㅔ이지네이션 o)
     public BookReflectionListResponseDto getReflectionsSummaryByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
         Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
         Page<BookReflectionEntity> page = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);

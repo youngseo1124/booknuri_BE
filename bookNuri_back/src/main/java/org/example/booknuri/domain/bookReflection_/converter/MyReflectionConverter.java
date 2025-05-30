@@ -16,7 +16,7 @@ public class MyReflectionConverter {
 
     private final BookReflectionLikeRepository bookReflectionLikeRepository;
 
-    // ✨ 단일 독후감 엔티티 → 내가 쓴 독후감 DTO 변환
+    //  단일 독후감 엔티티 → 내가 쓴 독후감 DTO 변환
     public MyReflectionResponseDto toDto(BookReflectionEntity entity, UserEntity currentUser) {
 
         return MyReflectionResponseDto.builder()

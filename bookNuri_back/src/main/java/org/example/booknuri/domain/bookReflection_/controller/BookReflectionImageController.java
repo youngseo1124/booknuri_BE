@@ -3,6 +3,7 @@ package org.example.booknuri.domain.bookReflection_.controller;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionRepository;
 import org.example.booknuri.domain.bookReflection_.service.BookReflectionImageService;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/book/reflection/image")
@@ -33,24 +35,41 @@ public class BookReflectionImageController {
     public ResponseEntity<?> uploadReflectionImages(@PathVariable Long reflectionId,
                                                     @RequestPart List<MultipartFile> images,
                                                     @AuthenticationPrincipal CustomUser currentUser) throws IOException {
-
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
 
-        // 1. 독후감 ID로 해당 유저의 독후감 찾기
+        //  reflectionId와 유저 정보로 해당 독후감 찾기
         BookReflectionEntity reflection = bookReflectionRepository.findByIdAndUser(reflectionId, user)
-                .orElseThrow(() -> new IllegalArgumentException("해당 독후감이 없습니다."));
+                .orElseThrow(() -> {
+                    return new IllegalArgumentException("해당 독후감이 없습니다.");
+                });
 
-        // 2. 이미지들을 S3에 업로드하고 URL 리스트로 받기
+        // 이미지들을 하나씩 S3에 업로드
         List<String> uploadedUrls = new ArrayList<>();
+        log.info(" 업로드할 이미지 수: {}", images.size());
+
         for (MultipartFile image : images) {
+            log.info("📷 업로드 시작 - 파일명: {}, 크기: {} bytes", image.getOriginalFilename(), image.getSize());
             String url = s3Uploader.upload(image);
             uploadedUrls.add(url);
+
         }
 
-        // 3. 업로드된 이미지 URL을 DB에 저장
+        //  DB에 업로드된 이미지 정보 저장
         bookReflectionImageService.saveImages(uploadedUrls, reflection);
+
+
 
         return ResponseEntity.ok(Map.of("uploadedImageUrls", uploadedUrls));
     }
+
+    @DeleteMapping("/{imageId}")
+    public ResponseEntity<?> deleteReflectionImage(@PathVariable Long imageId,
+                                                   @AuthenticationPrincipal CustomUser currentUser) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        bookReflectionImageService.deleteImage(imageId, user);
+        return ResponseEntity.ok(Map.of("message", "이미지가 삭제되었습니다."));
+    }
+
+
 
 }

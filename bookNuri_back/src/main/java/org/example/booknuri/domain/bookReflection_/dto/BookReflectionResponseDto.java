@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,4 +26,7 @@ public class BookReflectionResponseDto {
     // 내가 쓴 독후감인지 여부
     private boolean isWrittenByCurrentUser;
     private boolean visibleToPublic; //공개여부
+
+    //이미지 url
+    private List<String> imageUrls;
 }
