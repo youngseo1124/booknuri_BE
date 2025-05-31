@@ -71,7 +71,7 @@ public class BookReflectionService {
         BookReflectionEntity reflection = bookReflectionRepository.findByIdAndUser(dto.getReflectionId(), user)
                 .orElseThrow(() -> new IllegalArgumentException("독후감을 찾을 수 없습니다."));
 
-        reflection.updateReflection(dto.getContent(), dto.getRating(), dto.isContainsSpoiler(), dto.isVisibleToPublic());
+        reflection.updateReflection(dto.getTitle(),dto.getContent(), dto.getRating(), dto.isContainsSpoiler(), dto.isVisibleToPublic());
 
     }
 

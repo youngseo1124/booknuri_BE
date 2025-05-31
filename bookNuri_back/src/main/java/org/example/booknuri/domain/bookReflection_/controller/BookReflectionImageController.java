@@ -62,6 +62,7 @@ public class BookReflectionImageController {
         return ResponseEntity.ok(Map.of("uploadedImageUrls", uploadedUrls));
     }
 
+
     @DeleteMapping("/{imageId}")
     public ResponseEntity<?> deleteReflectionImage(@PathVariable Long imageId,
                                                    @AuthenticationPrincipal CustomUser currentUser) {

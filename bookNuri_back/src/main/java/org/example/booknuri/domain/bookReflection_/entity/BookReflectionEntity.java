@@ -85,7 +85,8 @@ public class BookReflectionEntity {
     }
 
     // 독후감 수정 메서드
-    public void updateReflection(String content, int rating, boolean containsSpoiler, boolean visibleToPublic) {
+    public void updateReflection(String title, String content, int rating, boolean containsSpoiler, boolean visibleToPublic) {
+        this.title = title;
         this.content = content;
         this.rating = rating;
         this.containsSpoiler = containsSpoiler;
