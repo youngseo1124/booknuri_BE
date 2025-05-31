@@ -144,7 +144,6 @@ public class JwtProvider {
         try {
             // JWT 토큰 추출: Authorization 헤더에서 "Bearer " 부분을 제거하고, 실제 JWT 토큰만 추출
             String jwt = authorization.replace("Bearer ", "");
-            log.info("jwt:" + jwt);
 
             // JWT 파싱(해석) (서명 검증 및 페이로드 추출)
             Jws<Claims> parsedToken = Jwts.parser()

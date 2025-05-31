@@ -46,6 +46,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        // ✅ 1. 요청 URI 로그
+        String requestUri = request.getRequestURI();
+        String method = request.getMethod();
+        log.info("📩 요청 도착 - [{}] {}", method, requestUri);
+
+        // ✅ 2. Authorization 헤더 로그
+        String authHeader = request.getHeader("Authorization");
+        log.info("🔐 Authorization 헤더: {}", authHeader);
+
         String jwt = extractTokenFromHeader(request); // Authorization 헤더에서 JWT 추출
 
         // 토큰이 없으면 다음 필터로 진행 (인증 X)
@@ -64,7 +73,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (valid && authentication != null && authentication.isAuthenticated()) {
             // 유효하고 인증 객체도 있으면 SecurityContext에 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("JWT 인증 완료. SecurityContext에 사용자 정보 저장됨");
         } else {
             // 토큰이 유효하지 않으면 SecurityContext 초기화 (인증 제거)
             log.info("유효하지 않은 JWT 토큰. SecurityContext 초기화");

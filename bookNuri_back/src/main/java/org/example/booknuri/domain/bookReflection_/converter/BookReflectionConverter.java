@@ -3,6 +3,7 @@ package org.example.booknuri.domain.bookReflection_.converter;
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.bookReflection_.dto.BookReflectionCreateRequestDto;
 import org.example.booknuri.domain.bookReflection_.dto.BookReflectionResponseDto;
+import org.example.booknuri.domain.bookReflection_.dto.ReflectionImageDto;
 import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
 import org.example.booknuri.domain.bookReflection_.entity.BookReflectionImageEntity;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionImageRepository;
@@ -28,10 +29,9 @@ public class BookReflectionConverter {
         boolean isMine = entity.getUser().getUsername().equals(currentUser.getUsername()); // 내가 쓴 독후감인지 체크
 
 
-        //이미지 url리스트 추출
-        List<String> imageUrls = bookReflectionImageRepository.findByReflection(entity)
+        List<ReflectionImageDto> imageList = bookReflectionImageRepository.findByReflection(entity)
                 .stream()
-                .map(BookReflectionImageEntity::getImageUrl)
+                .map(image -> new ReflectionImageDto(image.getId(), image.getImageUrl()))
                 .collect(Collectors.toList());
 
         return BookReflectionResponseDto.builder()
@@ -39,7 +39,7 @@ public class BookReflectionConverter {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .rating(entity.getRating())
-                .reviewerUsername(entity.getUser().getUsername()) // 유저에서 닉네임 or username 가져오기
+                .reviewerUsername(entity.getUser().getUsername())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .likeCount(entity.getLikeCount())
@@ -47,8 +47,7 @@ public class BookReflectionConverter {
                 .isWrittenByCurrentUser(isMine)
                 .containsSpoiler(entity.isContainsSpoiler())
                 .visibleToPublic(entity.isVisibleToPublic())
-                .imageUrls(imageUrls)
-
+                .imageList(imageList)
                 .build();
     }
 

@@ -29,5 +29,5 @@ public class BookReflectionResponseDto {
     private boolean visibleToPublic; //공개여부
 
     //이미지 url
-    private List<String> imageUrls;
+    private List<ReflectionImageDto> imageList;
 }
