@@ -26,6 +26,10 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.17.2'
 
+    implementation 'net.sourceforge.tess4j:tess4j:5.4.0'
+
+
+
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 

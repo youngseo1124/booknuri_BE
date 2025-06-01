@@ -11,6 +11,7 @@ import org.example.booknuri.global.security.entity.CustomUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class BookQuoteController {
     public ResponseEntity<?> getMyQuoteById(@PathVariable Long quoteId,
                                             @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        BookQuoteResponseDto dto = bookQuoteService.getMyQuoteById(quoteId, user);
+        MyQuoteResponseDto dto = bookQuoteService.getMyQuoteFullById(quoteId, user);
         return ResponseEntity.ok(dto);
     }
 
@@ -78,9 +79,21 @@ public class BookQuoteController {
     @GetMapping("/list/{isbn13}")
     public List<BookQuoteResponseDto> getQuotesByBook(@PathVariable String isbn13,
                                                       @RequestParam(defaultValue = "0") int offset,
-                                                      @RequestParam(defaultValue = "20") int limit,
+                                                      @RequestParam(defaultValue = "10") int limit,
                                                       @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
         return bookQuoteService.getQuotesByBook(isbn13, offset, limit, user);
     }
+
+    @PostMapping("/ocr")
+    public ResponseEntity<?> extractTextFromImage(@RequestParam("image") MultipartFile imageFile) {
+        try {
+            String extractedText = bookQuoteService.extractTextFromImage(imageFile);
+            return ResponseEntity.ok(Map.of("text", extractedText));
+        } catch (Exception e) {
+            log.error("📛 OCR 실패", e);
+            return ResponseEntity.internalServerError().body(Map.of("message", "OCR 처리 중 오류 발생"));
+        }
+    }
+
 }
