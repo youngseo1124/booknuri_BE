@@ -87,4 +87,11 @@ public class BookController {
         return restTemplate.getForObject("https://api.ipify.org", String.class);
     }
 
+    //  ISBN 존재 여부 확인 API
+    @GetMapping("/exist/{isbn13}")
+    public ResponseEntity<?> checkBookExistence(@PathVariable String isbn13) {
+        boolean exists = bookService.existsBookByIsbn(isbn13);
+        return ResponseEntity.ok(exists);
+    }
+
 }

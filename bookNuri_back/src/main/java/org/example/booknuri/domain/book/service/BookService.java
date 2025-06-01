@@ -42,4 +42,9 @@ public class BookService {
     }
 
 
+    public boolean existsBookByIsbn(String isbn13) {
+        return bookRepository.existsByIsbn13(isbn13);
+    }
+
+
 }

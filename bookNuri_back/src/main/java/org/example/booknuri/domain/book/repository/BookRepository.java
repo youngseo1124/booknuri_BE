@@ -11,6 +11,11 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
     Optional<BookEntity> findByIsbn13(String isbn13);
 
 
+    // 존재 여부만 확인하는 메서드
+    boolean existsByIsbn13(String isbn13);
+
+
+
 
 
     // Optional 없이 바로 반환!

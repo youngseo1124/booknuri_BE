@@ -1,6 +1,7 @@
 package org.example.booknuri.domain.bookQuote.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.example.booknuri.domain.book.entity.BookEntity;
@@ -20,11 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class BookQuoteService {
@@ -86,9 +91,12 @@ public class BookQuoteService {
     }
 
     //이미지->텍스트 ocr 추출
+    // ✨ 이미지 → 텍스트 OCR 추출
     public String extractTextFromImage(MultipartFile imageFile) throws IOException, TesseractException {
+
         File tempFile = File.createTempFile("ocr_", ".png");
         imageFile.transferTo(tempFile);
+        log.info("📸 업로드된 이미지 파일: {}", tempFile.getAbsolutePath());
 
         try {
             Tesseract tesseract = new Tesseract();
@@ -97,26 +105,52 @@ public class BookQuoteService {
             tesseract.setOcrEngineMode(1);
             tesseract.setPageSegMode(6);
 
-            // 1️⃣ OCR 추출
-            String rawText = tesseract.doOCR(tempFile);
+            // try 범위를 넓혀서 ImageIO.read()까지 포함시킴
+            try {
+                log.info("🔍 OCR 원본 파일 시도");
+                return cleanUpOcrText(tesseract.doOCR(tempFile));
+            } catch (TesseractException e) {
+                log.warn("⚠️ PNG로 OCR 실패, JPG 변환 후 재시도 👉 {}", e.getMessage());
 
-            // 2️⃣ OCR 줄바꿈 무시
-            rawText = rawText.replaceAll("\n", "");
+                BufferedImage originalImage = ImageIO.read(tempFile);
+                if (originalImage == null) {
+                    throw new IOException("❌ 이미지 파일을 읽을 수 없습니다.");
+                }
 
-            // 3️⃣ 한글 사이 공백 제거
-            String text = rawText.replaceAll("(?<=[가-힣])\\s+(?=[가-힣])", "");
+                File jpgFile = new File(tempFile.getParent(), tempFile.getName().replace(".png", ".jpg"));
+                ImageIO.write(originalImage, "jpg", jpgFile);
+                log.info("📤 JPG 변환 완료: {}", jpgFile.getAbsolutePath());
 
-            // 4️⃣ 줄바꿈 강제 추가할 기호 목록: , . ; ! ?
-            text = text.replaceAll("([,.;!?])", "$1\n");
-
-            // 5️⃣ 중복 공백 제거
-            text = text.replaceAll("\\s{2,}", " ").trim();
-
-            return text;
+                return cleanUpOcrText(tesseract.doOCR(jpgFile));
+            }
 
         } finally {
-            tempFile.delete();
+            boolean deleted = tempFile.delete();
+            if (!deleted) {
+                log.warn("🧹 tempFile 삭제 실패: {}", tempFile.getAbsolutePath());
+            }
         }
+    }
+
+
+    // ✂OCR 결과 클린업 함수
+    private String cleanUpOcrText(String rawText) {
+        log.info("📝 원본 OCR 결과:\n{}", rawText);
+
+        // 1️⃣ 줄바꿈 제거
+        rawText = rawText.replaceAll("\n", "");
+
+        // 2️⃣ 한글 사이 공백 제거
+        String text = rawText.replaceAll("(?<=[가-힣])\\s+(?=[가-힣])", "");
+
+        // 3️⃣ 문장 기호 뒤에 줄바꿈
+        text = text.replaceAll("([,.;!?])", "$1\n");
+
+        // 4️⃣ 중복 공백 제거
+        text = text.replaceAll("\\s{2,}", " ").trim();
+
+        log.info("🧼 정리된 텍스트 결과:\n{}", text);
+        return text;
     }
 
 
