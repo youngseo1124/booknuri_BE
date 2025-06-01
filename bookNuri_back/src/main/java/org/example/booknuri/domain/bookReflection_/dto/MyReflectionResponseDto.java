@@ -27,6 +27,7 @@ public class MyReflectionResponseDto {
 
     // 독후감 쓴 책 정보
     private String bookTitle;         // 책 제목
+    private String bookAuthor;
     private String isbn13;            // 책 ISBN
     private String bookImageUrl;      // 책 이미지 URL
 }

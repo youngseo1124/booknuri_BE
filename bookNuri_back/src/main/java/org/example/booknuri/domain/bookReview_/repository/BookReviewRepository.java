@@ -33,7 +33,7 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     Optional<BookReviewEntity> findByUserAndBook(UserEntity user, BookEntity book);
 
 
-    //특정책에 대해 활성화T상태인 리뷰들 (페이지네이션 O)
+    //특정책 리뷰들 (페이지네이션 O)
     Page<BookReviewEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13, Pageable pageable);
 
 
@@ -42,8 +42,6 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     Double getAverageReviewRatingByIsbn13(@Param("isbn13") String isbn13);
 
 
-    // 리뷰 개수 조회 (isActive = true인 것만)
-    int countByBook_Isbn13AndIsActiveTrue(String isbn13);
 
 
 

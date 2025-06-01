@@ -25,6 +25,7 @@ public class MyReviewResponseDto {
     private boolean containsSpoiler;
     //  리뷰 쓴 책 정보
     private String bookTitle;         // 책 제목
+    private String bookAuthor;        // 저자명
     private String isbn13;            // 책 ISBN
     private String bookImageUrl;      // 책 이미지 URL
 }

@@ -31,6 +31,7 @@ public class MyReviewConverter {
                 .containsSpoiler(entity.isContainsSpoiler())
                 // 책 정보
                 .bookTitle(entity.getBook().getBookname())        // 책 제목
+                .bookAuthor(entity.getBook().getAuthors())
                 .isbn13(entity.getBook().getIsbn13())             // 책 ISBN
                 .bookImageUrl(entity.getBook().getBookImageURL()) // 책 이미지 URL
                 .build();

@@ -96,7 +96,7 @@ public class BookReviewService {
         // 리스트 추출
         List<BookReviewEntity> reviews = page.getContent();
 
-        // 책 정보까지 포함된 DTO로 변환해서 반환
+        //
         return myReviewConverter.toDtoList(reviews, user);
     }
 

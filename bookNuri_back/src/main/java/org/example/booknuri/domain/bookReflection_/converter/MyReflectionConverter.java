@@ -31,6 +31,7 @@ public class MyReflectionConverter {
                 // 책 정보
                 .bookTitle(entity.getBook().getBookname())            // 책 제목
                 .isbn13(entity.getBook().getIsbn13())                 // 책 ISBN
+                .bookAuthor(entity.getBook().getAuthors())
                 .bookImageUrl(entity.getBook().getBookImageURL())     // 책 이미지 URL
                 .visibleToPublic(entity.isVisibleToPublic())
                 .build();
