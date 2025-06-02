@@ -114,6 +114,8 @@ public class BookReflectionService {
         Page<BookReflectionEntity> page = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);
         List<BookReflectionEntity> reflections = page.getContent();
 
+
+
         Double avg = bookReflectionRepository.getAverageReflectionRatingByIsbn13(isbn13);
         double averageRating = avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0;
 
@@ -122,10 +124,13 @@ public class BookReflectionService {
 
         List<BookReflectionResponseDto> dtos = bookReflectionConverter.toDtoList(reflections, currentUser);
 
+        int totalCount = bookReflectionRepository.countByBook_Isbn13AndIsActiveTrue(isbn13);
+
         return BookReflectionListResponseDto.builder()
                 .averageRating(averageRating)
                 .ratingDistribution(ratingDistribution)
                 .reflections(dtos)
+                .totalCount(totalCount)
                 .build();
     }
 

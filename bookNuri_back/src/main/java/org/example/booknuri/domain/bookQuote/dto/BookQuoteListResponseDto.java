@@ -14,4 +14,6 @@ import java.util.List;
 @Builder
 public class BookQuoteListResponseDto {
     private List<BookQuoteResponseDto> quotes;
+
+    private int totalCount;
 }

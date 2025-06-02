@@ -35,6 +35,9 @@ public class BookQuoteEntity {
     @Column(nullable = false)
     private int backgroundId;
 
+    @Column(nullable = false)
+    private boolean isActive = true;
+
     // 👁 공개 여부
     @Column(nullable = false)
     private boolean visibleToPublic;

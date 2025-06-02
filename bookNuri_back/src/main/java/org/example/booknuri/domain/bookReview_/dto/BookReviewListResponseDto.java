@@ -16,4 +16,6 @@ public class BookReviewListResponseDto {
     private double averageRating;
     private Map<Integer, Integer> ratingDistribution; // 예: 10점 몇 명, 8점 몇 명...
     private List<BookReviewResponseDto> reviews;
+
+    private int totalCount;
 }

@@ -32,7 +32,7 @@ public class BookReviewService {
     private final BookService bookService;
     private final BookReviewConverter bookReviewConverter;
     private final MyReviewConverter myReviewConverter;
-
+    private final BookReviewLikeService bookReviewLikeService;
 
 
     //내가 이미 이 책에 리뷰썼는지 아닌지 확인(이미 썼으면 T, 아직 안썻으면 F반환)
@@ -116,6 +116,8 @@ public class BookReviewService {
         Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
         Page<BookReviewEntity> page = bookReviewRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);
         List<BookReviewEntity> reviews = page.getContent();
+
+
         return bookReviewConverter.toDtoList(reviews, currentUser);
     }
 
@@ -144,11 +146,13 @@ public class BookReviewService {
 
         //  변환
         List<BookReviewResponseDto> dtos = bookReviewConverter.toDtoList(reviews, currentUser);
+        int totalCount= bookReviewRepository. countByBook_Isbn13AndIsActiveTrue(isbn13);
 
         return BookReviewListResponseDto.builder()
                 .averageRating(averageRating)
                 .ratingDistribution(ratingDistribution)
                 .reviews(dtos)
+                .totalCount(totalCount)
                 .build();
     }
 

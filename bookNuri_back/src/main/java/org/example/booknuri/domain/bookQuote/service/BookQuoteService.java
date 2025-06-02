@@ -8,10 +8,7 @@ import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.bookQuote.converter.BookQuoteConverter;
 import org.example.booknuri.domain.bookQuote.converter.MyQuoteConverter;
-import org.example.booknuri.domain.bookQuote.dto.BookQuoteCreateRequestDto;
-import org.example.booknuri.domain.bookQuote.dto.BookQuoteResponseDto;
-import org.example.booknuri.domain.bookQuote.dto.BookQuoteUpdateRequestDto;
-import org.example.booknuri.domain.bookQuote.dto.MyQuoteResponseDto;
+import org.example.booknuri.domain.bookQuote.dto.*;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
 import org.example.booknuri.domain.bookQuote.repository.BookQuoteRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -84,11 +81,29 @@ public class BookQuoteService {
     }
 
     // ✨ 특정 책 인용 전체 조회 (리스트용, 공개된 것만)
-    public List<BookQuoteResponseDto> getQuotesByBook(String isbn13, int offset, int limit, UserEntity currentUser) {
-        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+    public BookQuoteListResponseDto getQuotesByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort)); // ✅ 정렬 추가
         Page<BookQuoteEntity> page = bookQuoteRepository.findByBook_Isbn13AndVisibleToPublicTrue(isbn13, pageable);
-        return bookQuoteConverter.toDtoList(page.getContent(), currentUser);
+
+        int totalCount = bookQuoteRepository.countByBook_Isbn13AndIsActiveTrue(isbn13);
+
+        return BookQuoteListResponseDto.builder()
+                .quotes(bookQuoteConverter.toDtoList(page.getContent(), currentUser))
+                .totalCount(totalCount)
+                .build();
     }
+
+
+    private Sort getSortOrder(String sort) {
+        return switch (sort.toLowerCase()) {
+            case "like" -> Sort.by(Sort.Direction.DESC, "likeCount");
+            case "high" -> Sort.by(Sort.Direction.DESC, "fontScale"); // ✨ 폰트 크기 기준 (예시)
+            case "low" -> Sort.by(Sort.Direction.ASC, "fontScale");  // ✨ 폰트 작을수록 먼저 (예시)
+            default -> Sort.by(Sort.Direction.DESC, "createdAt"); // 최신순
+        };
+    }
+
+
 
     //이미지->텍스트 ocr 추출
     // ✨ 이미지 → 텍스트 OCR 추출

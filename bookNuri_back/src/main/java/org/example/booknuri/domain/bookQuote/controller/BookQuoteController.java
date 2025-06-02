@@ -75,15 +75,17 @@ public class BookQuoteController {
         return ResponseEntity.ok(dto);
     }
 
-    // ✨ 특정 책의 공개된 인용 목록 (책 상세페이지용)
+    // ✨ 특정 책의 공개된 인용 목록 (책 상세페이지용), 정렬 가능
     @GetMapping("/list/{isbn13}")
-    public List<BookQuoteResponseDto> getQuotesByBook(@PathVariable String isbn13,
-                                                      @RequestParam(defaultValue = "0") int offset,
-                                                      @RequestParam(defaultValue = "10") int limit,
-                                                      @AuthenticationPrincipal CustomUser currentUser) {
+    public BookQuoteListResponseDto getQuotesByBook(@PathVariable String isbn13,
+                                                    @RequestParam(defaultValue = "new") String sort, // ✅ 추가
+                                                    @RequestParam(defaultValue = "0") int offset,
+                                                    @RequestParam(defaultValue = "10") int limit,
+                                                    @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        return bookQuoteService.getQuotesByBook(isbn13, offset, limit, user);
+        return bookQuoteService.getQuotesByBook(isbn13, sort, offset, limit, user);
     }
+
 
     @PostMapping("/ocr")
     public ResponseEntity<?> extractTextFromImage(@RequestParam("image") MultipartFile imageFile) {

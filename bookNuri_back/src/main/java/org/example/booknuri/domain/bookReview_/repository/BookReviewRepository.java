@@ -42,6 +42,10 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     Double getAverageReviewRatingByIsbn13(@Param("isbn13") String isbn13);
 
 
+    // 리뷰 전체 수 (isActive = true인 것만)
+    int countByBook_Isbn13AndIsActiveTrue(String isbn13);
+
+
 
 
 
