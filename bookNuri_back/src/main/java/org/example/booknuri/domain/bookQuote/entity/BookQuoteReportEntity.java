@@ -29,7 +29,7 @@ public class BookQuoteReportEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 🚨 신고한 유저
+    //  신고한 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
     private UserEntity reporter;
@@ -46,11 +46,11 @@ public class BookQuoteReportEntity {
     )
     private BookQuoteEntity quote;
 
-    // 📄 신고 사유 (50자 제한)
+    //  신고 사유 (50자 제한)
     @Column(length = 50, nullable = false)
     private String reason;
 
-    // 🕒 신고한 날짜/시간
+    //  신고한 날짜/시간
     @Column(nullable = false)
     private LocalDateTime reportedAt;
 }

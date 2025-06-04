@@ -28,12 +28,12 @@ public class BookQuoteLikeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ❤️ 좋아요 누른 유저
+    //  좋아요 누른 유저
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    // 📖 좋아요 대상 인용
+    // 좋아요 대상 인용
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "quote_id",
@@ -45,7 +45,7 @@ public class BookQuoteLikeEntity {
     )
     private BookQuoteEntity quote;
 
-    // 🕒 좋아요 누른 시각
+    //  좋아요 누른 시각
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date likedAt;

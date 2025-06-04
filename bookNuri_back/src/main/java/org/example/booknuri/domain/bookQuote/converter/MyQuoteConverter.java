@@ -41,7 +41,7 @@ public class MyQuoteConverter {
 
 
 
-    // ✨ 인용 리스트 → 내가 쓴 인용 DTO 리스트 변환
+    //  인용 리스트 → 내가 쓴 인용 DTO 리스트 변환
     public List<MyQuoteResponseDto> toDtoList(List<BookQuoteEntity> entities, UserEntity currentUser) {
         return entities.stream()
                 .map(entity -> toDto(entity, currentUser)) // 단일 변환 재사용

@@ -1,0 +1,43 @@
+package org.example.booknuri.domain.elasticsearch.service;
+
+import lombok.RequiredArgsConstructor;
+import org.example.booknuri.domain.elasticsearch.document.LibraryBookSearchDocument;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.query.Criteria;
+import org.springframework.data.elasticsearch.core.query.CriteriaQuery;
+import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class LibraryBookSearchService {
+
+    private final ElasticsearchOperations operations;
+
+    public List<LibraryBookSearchDocument> searchBooks(String libCode, String keyword, String sortType) {
+        Criteria criteria = new Criteria("libCode").is(libCode)
+                .and(new Criteria("bookname").matches(keyword));
+
+        Sort sort = switch (sortType) {
+            case "like" -> Sort.by(Sort.Order.desc("likeCount"));
+            case "review" -> Sort.by(Sort.Order.desc("reviewCount"));
+            case "new" -> Sort.by(Sort.Order.desc("publicationDate"));
+            default -> Sort.unsorted();
+        };
+
+        Query query = new CriteriaQuery(criteria, PageRequest.of(0, 20, sort));
+
+        SearchHits<LibraryBookSearchDocument> hits =
+                operations.search(query, LibraryBookSearchDocument.class);
+
+        return hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .toList();
+    }
+}

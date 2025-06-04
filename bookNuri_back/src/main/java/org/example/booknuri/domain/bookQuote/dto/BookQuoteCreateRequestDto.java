@@ -3,7 +3,7 @@ package org.example.booknuri.domain.bookQuote.dto;
 import lombok.*;
 
 /**
- * 📌 BookQuoteCreateRequestDto
+ *  BookQuoteCreateRequestDto
  * - 유저가 새로운 인용을 작성할 때 사용하는 요청 DTO
  * - quoteText + 스타일 정보 포함
  */

@@ -43,4 +43,16 @@ public interface BookViewLogRepository extends JpaRepository<BookViewLogEntity, 
     // 중복 제거 + 삭제 대상 유저 목록 조회용
     @Query("SELECT DISTINCT b.user.username FROM BookViewLogEntity b")
     List<String> findAllUserIds();
+
+
+
+    // 책아이디 기준 그룹화해서 오늘날짜 특정책 몇번 조회됏는지 카운트
+    @Query("""
+    SELECT b.book.id, COUNT(b)
+    FROM BookViewLogEntity b
+    WHERE b.viewedAt BETWEEN :start AND :end
+    GROUP BY b.book.id
+""")
+    List<Object[]> countViewsByBookIdBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
 }

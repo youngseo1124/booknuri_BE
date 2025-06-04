@@ -24,7 +24,7 @@ public class BookQuoteLikeController {
     ) {
         boolean liked = bookQuoteLikeService.toggleLike(quoteId, currentUser.getUsername());
 
-        // ✅ 응답 JSON 형태로 반환
+        //  응답 JSON 형태로 반환
         return ResponseEntity.ok(Map.of("liked", liked));
     }
 }

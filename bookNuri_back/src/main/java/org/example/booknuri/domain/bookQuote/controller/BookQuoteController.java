@@ -48,7 +48,7 @@ public class BookQuoteController {
         return ResponseEntity.ok(Map.of("message", "인용이 성공적으로 수정되었습니다."));
     }
 
-    // ✨ 인용 삭제
+    //  인용 삭제
     @DeleteMapping("/{quoteId}")
     public ResponseEntity<?> deleteQuote(@PathVariable Long quoteId,
                                          @AuthenticationPrincipal CustomUser currentUser) {
@@ -57,7 +57,7 @@ public class BookQuoteController {
         return ResponseEntity.ok(Map.of("message", "인용이 성공적으로 삭제되었습니다."));
     }
 
-    // ✨ 내가 쓴 인용 목록 (마이페이지용)
+    //  내가 쓴 인용 목록 (마이페이지용)
     @GetMapping("/my")
     public List<MyQuoteResponseDto> getMyQuotes(@AuthenticationPrincipal CustomUser currentUser,
                                                 @RequestParam(defaultValue = "0") int offset,
@@ -66,7 +66,7 @@ public class BookQuoteController {
         return bookQuoteService.getMyQuotes(user, offset, limit);
     }
 
-    // ✨ 인용 수정화면용 단일 조회
+    //  인용 수정화면용 단일 조회
     @GetMapping("/my/{quoteId}")
     public ResponseEntity<?> getMyQuoteById(@PathVariable Long quoteId,
                                             @AuthenticationPrincipal CustomUser currentUser) {
@@ -75,7 +75,7 @@ public class BookQuoteController {
         return ResponseEntity.ok(dto);
     }
 
-    // ✨ 특정 책의 공개된 인용 목록 (책 상세페이지용), 정렬 가능
+    //  특정 책의 공개된 인용 목록 (책 상세페이지용), 정렬 가능
     @GetMapping("/list/{isbn13}")
     public BookQuoteListResponseDto getQuotesByBook(@PathVariable String isbn13,
                                                     @RequestParam(defaultValue = "new") String sort, // ✅ 추가
@@ -93,7 +93,6 @@ public class BookQuoteController {
             String extractedText = bookQuoteService.extractTextFromImage(imageFile);
             return ResponseEntity.ok(Map.of("text", extractedText));
         } catch (Exception e) {
-            log.error("📛 OCR 실패", e);
             return ResponseEntity.internalServerError().body(Map.of("message", "OCR 처리 중 오류 발생"));
         }
     }

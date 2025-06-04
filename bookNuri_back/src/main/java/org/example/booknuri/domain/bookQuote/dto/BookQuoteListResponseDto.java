@@ -5,7 +5,7 @@ import lombok.*;
 import java.util.List;
 
 /**
- * 📌 BookQuoteListResponseDto
+ * BookQuoteListResponseDto
  * - 특정 책에 대한 인용 리스트 응답 DTO (가로배너용)
  */
 @Data

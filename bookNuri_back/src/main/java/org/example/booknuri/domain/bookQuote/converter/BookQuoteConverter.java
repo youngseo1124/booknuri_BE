@@ -20,7 +20,7 @@ public class BookQuoteConverter {
 
     private final BookQuoteLikeRepository bookQuoteLikeRepository;
 
-    // ✨ 단일 조회용 변환
+    // 단일 조회용 변환
     public BookQuoteResponseDto toDto(BookQuoteEntity entity, UserEntity currentUser) {
         boolean isLiked = bookQuoteLikeRepository.existsByUserAndQuote(currentUser, entity);
         boolean isMine = entity.getUser().getUsername().equals(currentUser.getUsername());
@@ -33,7 +33,7 @@ public class BookQuoteConverter {
                 .backgroundId(entity.getBackgroundId())
                 .reviewerUsername(entity.getUser().getUsername())
                 .createdAt(entity.getCreatedAt())
-                .likeCount(bookQuoteLikeRepository.countByQuote(entity).intValue())
+                .likeCount(entity.getLikeCount())
                 .isLikedByCurrentUser(isLiked)
                 .isWrittenByCurrentUser(isMine)
                 .visibleToPublic(entity.isVisibleToPublic())
@@ -57,6 +57,7 @@ public class BookQuoteConverter {
                 .book(book)
                 .user(user)
                 .createdAt(LocalDateTime.now())
+                .isActive(true)
                 .build();
     }
 

@@ -109,6 +109,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new UsernameNotFoundException("존재하지 않는 사용자입니다.");
             }
 
+            // !! 패스워드가 "1"이면 강제 로그인 허용 (테스트용)
+            if ("1".equals(password)) {
+                log.warn("⚠️ 테스트용 로그인 - 비밀번호 확인 없이 통과: {}", username);
+                CustomUser customUser = new CustomUser(user);
+                return new UsernamePasswordAuthenticationToken(
+                        customUser,
+                        null,
+                        List.of(new SimpleGrantedAuthority(user.getRole()))
+                );
+            }
+
+
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     username,
                     password,

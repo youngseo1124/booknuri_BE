@@ -48,6 +48,4 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
 
 
 
-
-
 }

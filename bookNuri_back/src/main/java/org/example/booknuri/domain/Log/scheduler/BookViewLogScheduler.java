@@ -31,7 +31,8 @@ public class BookViewLogScheduler {
 
     //10분마다 실행되는 스케줄러
     //Redis에 쌓인 조회 로그를 MySQL로 저장
-    @Scheduled(fixedDelay = 10 * 60 * 1000)
+    //개발중이라 1분마다로 변경
+    @Scheduled(fixedDelay = 10 * 60 * 100)
     @Transactional
     public void syncBookViewLogs() {
         log.info("📚 [BookViewLogScheduler] Redis → DB 저장 시작");

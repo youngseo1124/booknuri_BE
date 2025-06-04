@@ -23,7 +23,7 @@ public class BookQuoteLikeService {
     private final BookQuoteRepository bookQuoteRepository;
     private final UserRepository userRepository;
 
-    // ✨ 좋아요 토글
+    //  좋아요 토글
     public boolean toggleLike(Long quoteId, String username) {
         // 1. 유저 조회
         UserEntity user = userRepository.findByUsername(username);

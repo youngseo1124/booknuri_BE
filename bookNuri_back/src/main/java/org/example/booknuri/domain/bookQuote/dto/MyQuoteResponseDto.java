@@ -5,7 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 📌 MyQuoteResponseDto
+ *  MyQuoteResponseDto
  * - 마이페이지에서 내가 쓴 인용 목록 조회 시 사용
  * - 책 정보 + 인용 스타일 + 좋아요 수 + 공개 여부 포함
  */

@@ -3,7 +3,7 @@ package org.example.booknuri.domain.bookQuote.dto;
 import lombok.*;
 
 /**
- * 📌 BookQuoteUpdateRequestDto
+ *  BookQuoteUpdateRequestDto
  * - 인용 수정 시 사용하는 요청 DTO
  * - 인용 문구 및 스타일 요소 수정 가능
  */

@@ -5,7 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * 📌 BookQuoteResponseDto
+ *  BookQuoteResponseDto
  * - 인용 조회용 응답 DTO (배너 표시용)
  * - 내가 쓴 인용인지 여부, 좋아요 여부, 공개여부 포함
  */
