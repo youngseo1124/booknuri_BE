@@ -21,11 +21,9 @@ public class LibraryBookIndexScheduler {
     private final LibraryBookRepository libraryBookRepository;
 
     /**
-     *  매일 새벽 2시에 실행 (UTC 기준으로 맞춰서 필요시 +시간대 조절)
+     *  매일 밤 11시에 실행 (UTC 기준으로 맞춰서 필요시 +시간대 조절)
      */
-    @Scheduled(cron = "0 0 2 * * *") // 매일 02:00 실행*/
-
-    @Scheduled(cron = "0 17 22 * * *")  // 매일 22시 09분 실행
+    @Scheduled(cron = "0 0 23 * * *")
     @Transactional(readOnly = true)
     public void updateChangedBooksToElasticsearch() {
         log.info("📢 [스케줄러 실행] 어제 변경된 리뷰/조회수 기반 es 색인 갱신 시작");

@@ -47,12 +47,17 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     int countByBook_Isbn13AndIsActiveTrue(String isbn13);
 
 
-    //어제 리뷰 생성된 책 아이디
-    @Query("SELECT DISTINCT br.book.id FROM BookReviewEntity br WHERE br.createdAt BETWEEN :start AND :end")
-    List<Long> findDistinctBookIdsByCreatedAtBetween(@Param("start") LocalDateTime start,
-                                                     @Param("end") LocalDateTime end);
 
-
+    //es업데이트용 어제 생선된 리뷰 찾는 쿼리문
+    @Query("""
+    SELECT DISTINCT br.book.id
+    FROM BookReviewEntity br
+    WHERE br.createdAt BETWEEN :start AND :end
+""")
+    List<Long> findDistinctBookIdsByCreatedAtBetween(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 
 
 
