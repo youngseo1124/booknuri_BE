@@ -22,7 +22,8 @@ public class LibraryBookSearchService {
 
     public List<LibraryBookSearchDocument> searchBooks(String libCode, String keyword, String sortType) {
         Criteria criteria = new Criteria("libCode").is(libCode)
-                .and(new Criteria("bookname").matches(keyword));
+                .and(new Criteria("bookname").contains(keyword));
+
 
         Sort sort = switch (sortType) {
             case "like" -> Sort.by(Sort.Order.desc("likeCount"));
@@ -40,4 +41,24 @@ public class LibraryBookSearchService {
                 .map(SearchHit::getContent)
                 .toList();
     }
+
+
+    //자동완성 기능
+    public List<LibraryBookSearchDocument> searchBookAutocomplete(String libCode, String keyword) {
+        Criteria criteria = new Criteria("libCode").is(libCode)
+                .and(new Criteria("bookname").startsWith(keyword));
+
+        Query query = new CriteriaQuery(
+                criteria,
+                PageRequest.of(0, 10, Sort.by(Sort.Order.desc("likeCount")))
+        );
+
+        SearchHits<LibraryBookSearchDocument> hits = operations.search(query, LibraryBookSearchDocument.class);
+
+        return hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .toList();
+    }
+
+
 }

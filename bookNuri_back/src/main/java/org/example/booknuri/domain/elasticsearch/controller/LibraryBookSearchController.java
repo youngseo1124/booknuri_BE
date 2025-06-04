@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/library-book-search")
+@RequestMapping("/library-book-search")
 public class LibraryBookSearchController {
 
     private final LibraryBookSearchService searchService;
@@ -24,11 +24,25 @@ public class LibraryBookSearchController {
         return ResponseEntity.ok(result);
     }
 
-    // 도서 색인 초기화 (5000개씩 배치)
+
+    //자동완성 기능
+    @GetMapping("/autocomplete")
+    public ResponseEntity<?> autocomplete(
+            @RequestParam String libCode,
+            @RequestParam String keyword
+    ) {
+        var result = searchService.searchBookAutocomplete(libCode, keyword);
+        return ResponseEntity.ok(result);
+    }
+
+
+
+
+    // 도서 색인 초기화
     @PostMapping("/init")
     public ResponseEntity<?> initIndex() {
         indexService.indexAllLibraryBooksInBatch();
-        return ResponseEntity.ok("✅ 색인 작업 완료!");
+        return ResponseEntity.ok("색인 작업 완료!");
     }
 
 }
