@@ -7,6 +7,7 @@ import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookClinetApiInfoResponseDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
+import org.example.booknuri.domain.elasticsearch.service.LibraryBookIndexService;
 import org.example.booknuri.domain.library.entity.LibraryBookEntity;
 import org.example.booknuri.domain.library.entity.LibraryEntity;
 import org.example.booknuri.domain.library.repository.LibraryBookRepository;
@@ -27,7 +28,7 @@ public class LibraryProcessorService {
     private final BookClinetApiInfoConverter bookConverter;
     private final BookRepository bookRepository;
     private final LibraryBookRepository libraryBookRepository;
-
+    private final LibraryBookIndexService libraryBookIndexService;
     @Async
     public CompletableFuture<Void> processLibraryBooksAsync(LibraryEntity library) {
 
@@ -120,8 +121,12 @@ public class LibraryProcessorService {
 
             libraryBookRepository.save(libBook);
             log.info("📚 [{}] - 소장 정보 저장 완료 (ISBN: {})", libCode, book.getIsbn13());
+
+            //  Elasticsearch 색인 바로 추가!
+            libraryBookIndexService.indexSingleLibraryBook(libBook);
         } else {
             log.debug("🟡 [{}] - 이미 소장 정보 존재함 (ISBN: {})", libCode, book.getIsbn13());
         }
     }
+
 }

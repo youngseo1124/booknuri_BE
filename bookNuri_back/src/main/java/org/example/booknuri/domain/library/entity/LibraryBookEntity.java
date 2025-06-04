@@ -15,7 +15,13 @@ import org.example.booknuri.domain.book.entity.BookEntity;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "library_book")
+@Table(
+        name = "library_book",
+        indexes = {
+                @Index(name = "idx_lib_code", columnList = "lib_code"),
+                @Index(name = "idx_book_id", columnList = "book_id")
+        }
+)
 public class LibraryBookEntity {
 
     @Id
