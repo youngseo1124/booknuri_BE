@@ -29,11 +29,11 @@ public class LibraryProcessorService {
     private final BookRepository bookRepository;
     private final LibraryBookRepository libraryBookRepository;
     private final LibraryBookIndexService libraryBookIndexService;
+
     @Async
     public CompletableFuture<Void> processLibraryBooksAsync(LibraryEntity library) {
-
         if (library == null) {
-            log.error("❌ 도서관 정보가 null.비동기 스킵됨");
+            log.error("❌ 도서관 정보가 null. 비동기 스킵됨");
             return CompletableFuture.completedFuture(null);
         }
 
@@ -42,7 +42,6 @@ public class LibraryProcessorService {
         try {
             log.info("📖 [START] {} 도서관 도서 처리 시작", libCode);
 
-            // 해당 도서관에서 책 기본 정보 리스트 받아옴 (isbn13, 등록일 등)
             List<BookClinetApiInfoResponseDto> bookList = apiClient.fetchBooksFromLibrary(libCode);
             log.info(" {} 도서관 - 도서 수집 완료 ({}권)", libCode, bookList.size());
 
@@ -56,16 +55,15 @@ public class LibraryProcessorService {
                 }
 
                 try {
-                    // Book 저장 (트랜잭션 단위)
-                    BookEntity book = processSingleBook(isbn);
+                    boolean[] isNew = new boolean[1];
+                    BookEntity book = processSingleBook(isbn, isNew);
 
                     if (book == null) {
                         log.warn("🚫 [{}] 도서 저장 실패해서 소장정보도 패스함", isbn);
                         continue;
                     }
 
-                    // LibraryBook 저장 (트랜잭션 단위)
-                    processLibraryBookIfNeeded(libCode, regDate, book);
+                    processLibraryBookIfNeeded(libCode, regDate, book, isNew[0]);
 
                 } catch (Exception e) {
                     log.error("💥 [{}] 한 권 저장 중 오류 발생 - {}", isbn, e.getMessage(), e);
@@ -81,14 +79,14 @@ public class LibraryProcessorService {
         return CompletableFuture.completedFuture(null);
     }
 
-    // 단일 ISBN에 대해 BookEntity 저장 처리
-     // 이미 있으면 skip, 없으면 상세 API 호출 후 저장
+    // 신규 여부도 전달 (boolean[] 사용)
     @Transactional
-    public BookEntity processSingleBook(String isbn) {
+    public BookEntity processSingleBook(String isbn, boolean[] isNew) {
         BookEntity book = bookRepository.findByIsbn13(isbn).orElse(null);
 
         if (book != null) {
             log.debug(" 기존 도서 있음 - {}", isbn);
+            isNew[0] = false;
             return book;
         }
 
@@ -99,6 +97,7 @@ public class LibraryProcessorService {
             book = bookConverter.toEntity(detailDto);
 
             book = bookRepository.save(book);
+            isNew[0] = true;
             log.info("✅ [신규도서 저장] {} ({})", detailDto.getBookname(), isbn);
             return book;
 
@@ -108,10 +107,9 @@ public class LibraryProcessorService {
         }
     }
 
-    //2. 도서관 소장 관계 저장 처리
-    //이미 존재하면 skip, 없으면 저장
+    // 신규 도서일 경우에만 Elasticsearch 색인
     @Transactional
-    public void processLibraryBookIfNeeded(String libCode, String regDate, BookEntity book) {
+    public void processLibraryBookIfNeeded(String libCode, String regDate, BookEntity book, boolean indexNow) {
         if (!libraryBookRepository.existsByLibCodeAndBook(libCode, book)) {
             LibraryBookEntity libBook = LibraryBookEntity.builder()
                     .libCode(libCode)
@@ -122,8 +120,10 @@ public class LibraryProcessorService {
             libraryBookRepository.save(libBook);
             log.info("📚 [{}] - 소장 정보 저장 완료 (ISBN: {})", libCode, book.getIsbn13());
 
-            //  Elasticsearch 색인 바로 추가!
-            libraryBookIndexService.indexSingleLibraryBook(libBook);
+            if (indexNow) {
+                libraryBookIndexService.indexSingleLibraryBook(libBook);
+            }
+
         } else {
             log.debug("🟡 [{}] - 이미 소장 정보 존재함 (ISBN: {})", libCode, book.getIsbn13());
         }

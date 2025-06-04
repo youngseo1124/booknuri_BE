@@ -21,13 +21,21 @@ java {
 repositories {
     mavenCentral()
 }
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == 'co.elastic.clients') {
+            useVersion '8.11.1'
+        }
+    }
+}
+
 
 
 dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.data:spring-data-elasticsearch:5.2.1'
-    implementation 'co.elastic.clients:elasticsearch-java:8.18.0'
+    implementation 'co.elastic.clients:elasticsearch-java:8.11.1'
 
 
     implementation 'org.jsoup:jsoup:1.17.2'

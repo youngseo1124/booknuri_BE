@@ -48,8 +48,9 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
 
 
     //어제 리뷰 생성된 책 아이디
-    List<Long> findDistinctBookIdsByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-
+    @Query("SELECT DISTINCT br.book.id FROM BookReviewEntity br WHERE br.createdAt BETWEEN :start AND :end")
+    List<Long> findDistinctBookIdsByCreatedAtBetween(@Param("start") LocalDateTime start,
+                                                     @Param("end") LocalDateTime end);
 
 
 
