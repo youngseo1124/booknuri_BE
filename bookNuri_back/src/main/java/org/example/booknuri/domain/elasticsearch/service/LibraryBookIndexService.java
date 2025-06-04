@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -157,6 +159,28 @@ public class LibraryBookIndexService {
             log.error("❌ 색인 중 오류 - bookId: {}, message: {}", book.getId(), e.getMessage(), e);
         }
     }
+
+    //어제 리뷰 or 조회수 바뀐 책 ID 목록 구하기(es 색인 갱신용)
+    public Set<Long> getBooksWithChangedStatsYesterday() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        // 어제 리뷰 생성된 책 ID
+        List<Long> reviewChangedBookIds = bookReviewRepository.findDistinctBookIdsByCreatedAtBetween(
+                yesterday.atStartOfDay(), today.atStartOfDay()
+        );
+
+        // 어제 조회수 기록된 책 ID
+        List<Long> viewedBookIds = bookViewCountLogRepository.findDistinctBookIdsByDate(yesterday);
+
+        // 둘 다 합쳐서 Set으로 중복 제거
+        Set<Long> allChangedBookIds = new HashSet<>();
+        allChangedBookIds.addAll(reviewChangedBookIds);
+        allChangedBookIds.addAll(viewedBookIds);
+
+        return allChangedBookIds;
+    }
+
 
 
 

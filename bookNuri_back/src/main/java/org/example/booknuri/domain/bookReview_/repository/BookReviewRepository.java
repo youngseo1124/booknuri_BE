@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +45,13 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
 
     // 리뷰 전체 수 (isActive = true인 것만)
     int countByBook_Isbn13AndIsActiveTrue(String isbn13);
+
+
+    //어제 리뷰 생성된 책 아이디
+    List<Long> findDistinctBookIdsByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+
+
 
 
 
