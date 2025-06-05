@@ -21,7 +21,8 @@ public class LibraryBookSearchService {
 
     private final ElasticsearchOperations operations;
 
-    public LibraryBookSearchResponseDto searchBooks(String libCode, String keyword, String sortType) {
+    //  도서 검색 (페이지네이션)
+    public LibraryBookSearchResponseDto searchBooks(String libCode, String keyword, String sortType, int offset, int limit) {
         Criteria criteria = new Criteria("libCode").is(libCode)
                 .and(new Criteria("bookname").contains(keyword));
 
@@ -32,7 +33,9 @@ public class LibraryBookSearchService {
             default -> Sort.unsorted();
         };
 
-        Query query = new CriteriaQuery(criteria, PageRequest.of(0, 20, sort));
+        int page = offset / limit;
+        Query query = new CriteriaQuery(criteria, PageRequest.of(page, limit, sort));
+
         SearchHits<LibraryBookSearchDocument> hits = operations.search(query, LibraryBookSearchDocument.class);
 
         return LibraryBookSearchResponseDto.builder()
@@ -43,8 +46,7 @@ public class LibraryBookSearchService {
                 .build();
     }
 
-
-    //자동완성 기능
+    // 자동완성 기능 (페이지 고정)
     public List<LibraryBookSearchDocument> searchBookAutocomplete(String libCode, String keyword) {
         Criteria criteria = new Criteria("libCode").is(libCode)
                 .and(new Criteria("bookname").startsWith(keyword));
@@ -60,6 +62,4 @@ public class LibraryBookSearchService {
                 .map(SearchHit::getContent)
                 .toList();
     }
-
-
 }

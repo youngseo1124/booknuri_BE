@@ -18,18 +18,20 @@ public class LibraryBookSearchController {
     private final LibraryBookSearchService searchService;
     private final LibraryBookIndexService indexService;
 
-    // 도서 검색 API
+    // ✅ 도서 검색 API (페이지네이션 추가)
     @GetMapping
     public ResponseEntity<LibraryBookSearchResponseDto> search(
             @RequestParam String libCode,
             @RequestParam String keyword,
-            @RequestParam(defaultValue = "score") String sort
+            @RequestParam(defaultValue = "score") String sort,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "20") int limit
     ) {
-        LibraryBookSearchResponseDto result = searchService.searchBooks(libCode, keyword, sort);
+        LibraryBookSearchResponseDto result = searchService.searchBooks(libCode, keyword, sort, offset, limit);
         return ResponseEntity.ok(result);
     }
 
-    //  자동완성 API
+    // 자동완성 API
     @GetMapping("/autocomplete")
     public ResponseEntity<List<LibraryBookSearchDocument>> autocomplete(
             @RequestParam String libCode,
