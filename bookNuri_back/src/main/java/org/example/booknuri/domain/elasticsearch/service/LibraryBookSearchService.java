@@ -2,6 +2,7 @@ package org.example.booknuri.domain.elasticsearch.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.elasticsearch.document.LibraryBookSearchDocument;
+import org.example.booknuri.domain.elasticsearch.dto.LibraryBookSearchResponseDto;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -20,10 +21,9 @@ public class LibraryBookSearchService {
 
     private final ElasticsearchOperations operations;
 
-    public List<LibraryBookSearchDocument> searchBooks(String libCode, String keyword, String sortType) {
+    public LibraryBookSearchResponseDto searchBooks(String libCode, String keyword, String sortType) {
         Criteria criteria = new Criteria("libCode").is(libCode)
                 .and(new Criteria("bookname").contains(keyword));
-
 
         Sort sort = switch (sortType) {
             case "like" -> Sort.by(Sort.Order.desc("likeCount"));
@@ -33,13 +33,14 @@ public class LibraryBookSearchService {
         };
 
         Query query = new CriteriaQuery(criteria, PageRequest.of(0, 20, sort));
+        SearchHits<LibraryBookSearchDocument> hits = operations.search(query, LibraryBookSearchDocument.class);
 
-        SearchHits<LibraryBookSearchDocument> hits =
-                operations.search(query, LibraryBookSearchDocument.class);
-
-        return hits.getSearchHits().stream()
-                .map(SearchHit::getContent)
-                .toList();
+        return LibraryBookSearchResponseDto.builder()
+                .totalCount(hits.getTotalHits())
+                .results(hits.getSearchHits().stream()
+                        .map(SearchHit::getContent)
+                        .toList())
+                .build();
     }
 
 

@@ -126,3 +126,20 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
+/*
+###
+POST http://localhost:8080/db/daegu-books
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3NDkwNjExODAsInVzZXJuYW1lIjoiNDI2NTMxMTIxNSIsInJvbGUiOiJST0xFX1VTRVIifQ.9pZICMlUr7TqrnQGG7QhvxS64UtBKYuz-n2xBBm60qSLd3S4AUr7tTTUE38DiQoHJTtHlJnZIaU0OBHoTAVgFw
+
+
+
+
+###
+GET http://localhost:8080/book/my-ip
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3NDkwNjExODAsInVzZXJuYW1lIjoiNDI2NTMxMTIxNSIsInJvbGUiOiJST0xFX1VTRVIifQ.9pZICMlUr7TqrnQGG7QhvxS64UtBKYuz-n2xBBm60qSLd3S4AUr7tTTUE38DiQoHJTtHlJnZIaU0OBHoTAVgFw
+
+*/
