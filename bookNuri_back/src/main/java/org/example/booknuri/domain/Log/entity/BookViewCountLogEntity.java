@@ -11,7 +11,12 @@ import org.example.booknuri.domain.book.entity.BookEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "book_view_count_log")
+@Table(
+        name = "book_view_count_log",
+        indexes = {
+                @Index(name = "idx_date_book", columnList = "date, book_id")
+        }
+)
 public class BookViewCountLogEntity {
 
     @Id
