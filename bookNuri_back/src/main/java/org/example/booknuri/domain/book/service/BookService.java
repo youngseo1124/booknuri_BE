@@ -19,7 +19,14 @@ public class BookService {
 
     //책 상세정보 반환(정적 데이터)
     public BookInfoResponseDto getBookDetailByIsbn(String isbn13) {
-        // 1. Redis 캐시 먼저 확인
+        BookEntity book = bookRepository.findByIsbn13(isbn13)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ISBN입니다: " + isbn13));
+
+        return bookConverter.toBookInfoResponseDto(book);
+
+
+
+     /*   // 1. Redis 캐시 먼저 확인
         BookInfoResponseDto cached = (BookInfoResponseDto) redisTemplate.opsForValue().get("book:detail:" + isbn13);
         if (cached != null) {
             return cached;
@@ -32,7 +39,7 @@ public class BookService {
         BookInfoResponseDto dto = bookConverter.toBookInfoResponseDto(book);
 
         redisTemplate.opsForValue().set("book:detail:" + isbn13, dto);
-        return dto;
+        return dto;*/
     }
 
     //isbn으로 책 찾기

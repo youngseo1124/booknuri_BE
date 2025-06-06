@@ -30,6 +30,7 @@ public class LibraryBookSearchService {
             case "like" -> Sort.by(Sort.Order.desc("likeCount"));
             case "review" -> Sort.by(Sort.Order.desc("reviewCount"));
             case "new" -> Sort.by(Sort.Order.desc("publicationDate"));
+            case "old" -> Sort.by(Sort.Order.asc("publicationDate")); // ✅ 추가된 부분!
             default -> Sort.unsorted();
         };
 
@@ -45,6 +46,7 @@ public class LibraryBookSearchService {
                         .toList())
                 .build();
     }
+
 
     // 자동완성 기능 (페이지 고정)
     public List<LibraryBookSearchDocument> searchBookAutocomplete(String libCode, String keyword) {
