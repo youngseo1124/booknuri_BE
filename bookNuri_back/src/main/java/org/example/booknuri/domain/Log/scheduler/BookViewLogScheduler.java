@@ -90,8 +90,8 @@ public class BookViewLogScheduler {
 
     // 오래된 로그 및 초과 로그 정리 메서드(6개월 초과시 삭제)
     private void deleteOldLogs() {
-        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
-        bookViewLogRepository.deleteOlderThan(sixMonthsAgo);
+        LocalDateTime oneMonthsAgo = LocalDateTime.now().minusMonths(1);
+        bookViewLogRepository.deleteOlderThan(oneMonthsAgo);
 
         List<String> userIds = bookViewLogRepository.findAllUserIds();
         for (String userId : userIds) {

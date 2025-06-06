@@ -3,6 +3,7 @@ package org.example.booknuri.domain.Log.repository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.Log.entity.BookViewLogEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ public interface BookViewLogRepository extends JpaRepository<BookViewLogEntity, 
 
 
 
-    //  6개월 이상 지난 오래된 로그 삭제용
+    //  1개월 이상 지난 오래된 로그 삭제용
     @Modifying
     @Query("DELETE FROM BookViewLogEntity b WHERE b.viewedAt < :cutoff")
     void deleteOlderThan(@Param("cutoff") LocalDateTime cutoff);
@@ -54,5 +55,21 @@ public interface BookViewLogRepository extends JpaRepository<BookViewLogEntity, 
     GROUP BY b.book.id
 """)
     List<Object[]> countViewsByBookIdBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    //연령,성별 별 인기도서
+    @Query("""
+    SELECT bvl.book.id
+    FROM BookViewLogEntity bvl
+    WHERE bvl.gender = :gender
+      AND bvl.birthYear BETWEEN :minYear AND :maxYear
+    ORDER BY bvl.viewedAt DESC
+""")
+    List<Long> findTopBookIdsByGenderAndBirthYear(
+            @Param("gender") String gender,
+            @Param("minYear") int minYear,
+            @Param("maxYear") int maxYear,
+            Pageable pageable
+    );
+
 
 }

@@ -44,11 +44,17 @@ public interface BookViewCountLogRepository extends JpaRepository<BookViewCountL
     );
 
     // 어제 조회수 기록된 책 ID(es 갱신 스케쥴러용)
-    @Query("SELECT DISTINCT b.book.id FROM BookViewCountLogEntity b WHERE b.date = :targetDate")
+   /* @Query("SELECT DISTINCT b.book.id FROM BookViewCountLogEntity b WHERE b.date = :targetDate")
+    List<Long> findDistinctBookIdsByDate(@Param("targetDate") LocalDate targetDate);
+*/
+    //조회수 2 이상인것만 가져오게 ㅇㅇ
+    @Query("SELECT DISTINCT b.book.id FROM BookViewCountLogEntity b WHERE b.date = :targetDate AND b.viewCount >= 2")
     List<Long> findDistinctBookIdsByDate(@Param("targetDate") LocalDate targetDate);
 
 
 
     List<BookViewCountLogEntity> findAllByBook_IdAndDate(Long bookId, LocalDate date);
 
+
+    List<BookViewCountLogEntity> findTop70ByOrderByViewCountDesc();
 }

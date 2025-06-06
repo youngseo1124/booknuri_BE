@@ -22,8 +22,8 @@ public class BookViewCountScheduler {
     private final BookViewLogRepository bookViewLogRepository;
     private final BookViewCountLogRepository bookViewCountLogRepository;
 
-    //  1분마다 실행되는 스케줄러 (개발 중이라 자정 대신 1분으로 설정)
-    @Scheduled(fixedDelay = 60 * 1000)
+    //  600초마다 실행되는 스케쥴러
+    @Scheduled(fixedDelay = 600 * 1000)
     @Transactional
     public void saveDailyBookViewStats() {
         log.info("[BookViewCountScheduler] 도서 하루 조회갯수 집계시작");
@@ -63,10 +63,12 @@ public class BookViewCountScheduler {
             }
         }
 
-        //  오래된 데이터 정리 (100일 이전 기록 삭제)
-        LocalDate cutoff = today.minusDays(100);
+        //  오래된 데이터 정리 (365일 이전 기록 삭제)
+        LocalDate cutoff = today.minusDays(365);
         bookViewCountLogRepository.deleteByDateBefore(cutoff);
 
         log.info("[BookViewCountScheduler] 인기 도서 집계 완료");
     }
+
+
 }

@@ -18,7 +18,7 @@ public interface UserBookViewLogRepository extends JpaRepository<UserBookViewLog
 
     Optional<UserBookViewLogEntity> findByUserAndBook(UserEntity user, BookEntity book);
 
-    //20개 넘는거 삭제
+    //30개 넘는거 삭제
     @Modifying
     @Query(value = """
         DELETE FROM user_book_view_log
@@ -27,13 +27,16 @@ public interface UserBookViewLogRepository extends JpaRepository<UserBookViewLog
                 SELECT id FROM user_book_view_log
                 WHERE user_id = :userId
                 ORDER BY viewed_at DESC
-                LIMIT 20
+                LIMIT 30
             ) tmp
         ) AND user_id = :userId
     """, nativeQuery = true)
     void deleteExceedingLimit(@Param("userId") String userId);
 
 
-    //최근 목록 20개 불러오기
-    List<UserBookViewLogEntity> findTop20ByUserOrderByViewedAtDesc(UserEntity user);
+    //최근 목록 (30개) 불러오기
+    List<UserBookViewLogEntity> findTop30ByUserOrderByViewedAtDesc(UserEntity user);
+
+    // 최근 본 책 7개 가져오기 (개인 맞춤 추천용)
+    List<UserBookViewLogEntity> findTop7ByUserOrderByViewedAtDesc(UserEntity user);
 }

@@ -32,7 +32,7 @@ public class UserBookViewLogService {
             userBookViewLogRepository.save(newLog);
         }
 
-        // 20개 초과 시 삭제
+        // 30개 초과 시 삭제
         userBookViewLogRepository.deleteExceedingLimit(user.getUsername());
     }
 }

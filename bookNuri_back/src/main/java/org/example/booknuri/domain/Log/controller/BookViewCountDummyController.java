@@ -7,12 +7,17 @@ package org.example.booknuri.domain.Log.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.Log.entity.BookViewCountLogEntity;
+import org.example.booknuri.domain.Log.entity.BookViewLogEntity;
 import org.example.booknuri.domain.Log.repository.BookViewCountLogRepository;
+import org.example.booknuri.domain.Log.repository.BookViewLogRepository;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
 
+import org.example.booknuri.domain.user.entity.UserEntity;
+import org.example.booknuri.domain.user.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,7 +28,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 @RestController
@@ -32,6 +40,9 @@ public class BookViewCountDummyController {
 
     private final BookRepository bookRepository;
     private final BookViewCountLogRepository bookViewCountLogRepository;
+    private final BookViewLogRepository bookViewLogRepository;
+    private final UserRepository userRepository;
+
 
     // 생략된 import 및 클래스 선언 동일
 
@@ -123,4 +134,56 @@ public class BookViewCountDummyController {
         Node node = nodeList.item(0);
         return node.getTextContent();
     }
+
+    @PostMapping("/view-log")
+    public ResponseEntity<String> generateDummyBookViews() {
+        List<BookViewCountLogEntity> topBooks = bookViewCountLogRepository.findTop70ByOrderByViewCountDesc();
+
+        List<String> genders = List.of("M", "F");
+        List<Integer> birthYears = List.of(2008, 1998, 1988, 1978, 1968); // 10~50대
+
+        LocalDateTime now = LocalDateTime.of(2025, 6, 6, 12, 0);
+
+        int maxUsers = 30;
+
+        for (String gender : genders) {
+            for (Integer birthYear : birthYears) {
+                int userIndex = 1;
+
+                for (int i = 0; i < topBooks.size(); i++) {
+                    int count = maxUsers - i;
+                    BookEntity book = topBooks.get(i).getBook();
+
+                    for (int j = 0; j < count; j++) {
+                        String username = String.format("user_%d%s_%04d", birthYear, gender, userIndex++);
+                        UserEntity user = userRepository.findByUsername(username);
+                        if (user == null) {
+                            user = userRepository.save(UserEntity.builder()
+                                    .username(username)
+                                    .gender(gender)
+                                    .birth(birthYear * 10000 + 101)  // Integer로 저장 (ex. 19980101)
+                                    .build());
+                        }
+
+
+                        BookViewLogEntity log = BookViewLogEntity.builder()
+                                .user(user)
+                                .book(book)
+                                .gender(gender)
+                                .birthYear(birthYear)
+                                .viewedAt(now.minusSeconds(new Random().nextInt(3600 * 12))) // 약간 랜덤화
+                                .build();
+
+                        bookViewLogRepository.save(log);
+                    }
+                }
+            }
+        }
+
+        return ResponseEntity.ok("더미 book_view_log 데이터 생성 완료");
+    }
+
+
+
+
 }

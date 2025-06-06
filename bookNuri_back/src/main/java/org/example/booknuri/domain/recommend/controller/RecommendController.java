@@ -28,4 +28,25 @@ public class RecommendController {
         UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
         return recommendService.getBestSeller(user, period, mainCategoryId);
     }
+
+    //개인 맞춤 추천
+    @GetMapping("/personal")
+    public List<RecommendBookDto> getPersonalRecommend(@AuthenticationPrincipal CustomUser jwtuser) {
+        UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
+        return recommendService.getPersonalizedRecommendation(user);
+    }
+
+    //연령,성별별 베스트셀러(Ex20대 여성 베스트셀러)
+    // 연령/성별 베스트셀러 API
+    @GetMapping("/bestseller/demographic")
+    public List<RecommendBookDto> getDemographicRecommend(
+            @AuthenticationPrincipal CustomUser jwtuser,
+            @RequestParam("gender") String gender,
+            @RequestParam("birthYearGroup") int birthYearGroup
+    ) {
+        UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
+        return recommendService.getDemographicRecommend(user, gender, birthYearGroup);
+    }
+
+
 }
