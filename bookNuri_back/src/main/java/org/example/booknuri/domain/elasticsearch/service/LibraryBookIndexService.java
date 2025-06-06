@@ -15,13 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.concurrent.*;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class LibraryBookIndexService {
 
@@ -29,21 +27,19 @@ public class LibraryBookIndexService {
     private final LibraryBookSearchRepository searchRepository;
     private final BookReviewRepository bookReviewRepository;
     private final BookViewCountLogRepository bookViewCountLogRepository;
+    private final LibraryBookIndexWorker indexWorker;
 
     public void indexAllLibraryBooks() {
         List<LibraryBookEntity> allLibraryBooks = libraryBookRepository.findAll();
-
         LocalDate now = LocalDate.now();
         LocalDate sixMonthsAgo = now.minusMonths(6);
 
         List<LibraryBookSearchDocument> documents = allLibraryBooks.stream().map(lb -> {
             BookEntity book = lb.getBook();
 
-            // 1️⃣ 리뷰 수 (isActive = true)
             int reviewCount = bookReviewRepository.countByBook_Isbn13AndIsActiveTrue(book.getIsbn13());
-
-            // 2️⃣ 6개월간 조회수 합산
             int viewCount = bookViewCountLogRepository.getTotalViewCountByBookAndDateRange(book, sixMonthsAgo, now);
+            Integer year = book.getPublicationDate(); // ✅ Integer 그대로 넘김
 
             return LibraryBookSearchDocument.builder()
                     .id(lb.getLibCode() + "_" + book.getId())
@@ -52,80 +48,37 @@ public class LibraryBookIndexService {
                     .bookname(book.getBookname())
                     .authors(book.getAuthors())
                     .publisher(book.getPublisher())
-                    .publicationDate(book.getPublicationDate())
+                    .publicationDate(year) // ✅ 변환 없이 Integer로 전달
                     .isbn13(book.getIsbn13())
-                    .description(book.getDescription())
                     .bookImageURL(book.getBookImageURL())
-                    .likeCount(viewCount) // 🔥 인기 = 6개월간 조회수
+                    .likeCount(viewCount)
                     .reviewCount(reviewCount)
                     .build();
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).toList();
 
         searchRepository.saveAll(documents);
     }
 
-
-
-    //초기 색인작업
-    @Transactional(readOnly = true)
     public void indexAllLibraryBooksInBatch() {
-        int page = 0;
-        int size = 370;
-        Page<LibraryBookEntity> libraryBooks;
+        int pageSize = 370;
+        int totalPages = libraryBookRepository.findAll().size() / pageSize + 1;
 
-        LocalDate now = LocalDate.now();
-        LocalDate sixMonthsAgo = now.minusMonths(6);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
 
-        do {
-            System.out.println("📄 색인 시작 - 페이지: " + page);
-            libraryBooks = libraryBookRepository.findAll(PageRequest.of(page, size));
+        for (int page = 0; page < totalPages; page++) {
+            final int currentPage = page;
+            executor.submit(() -> indexWorker.indexPage(currentPage, pageSize));
+        }
 
-            List<LibraryBookSearchDocument> documents = libraryBooks.getContent().stream().map(lb -> {
-                BookEntity book = lb.getBook();
-                String isbn = book.getIsbn13();
+        executor.shutdown();
+        try {
+            executor.awaitTermination(30, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
-                try {
-                    System.out.println("📚 처리 중 - bookId: " + book.getId() + ", isbn: " + isbn);
-
-                    int reviewCount = bookReviewRepository.countByBook_Isbn13AndIsActiveTrue(isbn);
-                    System.out.println("✅ 리뷰 카운트 완료: " + reviewCount);
-
-                    int viewCount = bookViewCountLogRepository.getTotalViewCountByBookAndDateRange(book, sixMonthsAgo, now);
-                    System.out.println("✅ 조회수 카운트 완료: " + viewCount);
-
-                    LibraryBookSearchDocument doc = LibraryBookSearchDocument.builder()
-                            .id(lb.getLibCode() + "_" + book.getId())
-                            .libCode(lb.getLibCode())
-                            .bookId(book.getId())
-                            .bookname(book.getBookname())
-                            .authors(book.getAuthors())
-                            .publisher(book.getPublisher())
-                            .publicationDate(book.getPublicationDate())
-                            .isbn13(isbn)
-                            .description(book.getDescription())
-                            .bookImageURL(book.getBookImageURL())
-                            .likeCount(viewCount)
-                            .reviewCount(reviewCount)
-                            .build();
-
-                    System.out.println("✅ 문서 build 완료 - bookId: " + book.getId());
-                    return doc;
-
-                } catch (Exception e) {
-                    System.out.println("❌ 오류 발생 - bookId: " + book.getId() + ", message: " + e.getMessage());
-                    return null;  // 이건 추후 필터링
-                }
-
-            }).filter(doc -> doc != null).toList();
-
-            searchRepository.saveAll(documents);
-            System.out.println("✅ 색인 완료 - 페이지: " + page);
-
-            page++;
-        } while (!libraryBooks.isLast());
+        log.info("🎉 전체 색인 완료");
     }
-
-    // LibraryBookIndexService.java
 
     @Transactional(readOnly = true)
     public void indexSingleLibraryBook(LibraryBookEntity lb) {
@@ -136,6 +89,7 @@ public class LibraryBookIndexService {
         try {
             int reviewCount = bookReviewRepository.countByBook_Isbn13AndIsActiveTrue(book.getIsbn13());
             int viewCount = bookViewCountLogRepository.getTotalViewCountByBookAndDateRange(book, sixMonthsAgo, now);
+            Integer year = book.getPublicationDate();
 
             LibraryBookSearchDocument doc = LibraryBookSearchDocument.builder()
                     .id(lb.getLibCode() + "_" + book.getId())
@@ -144,9 +98,8 @@ public class LibraryBookIndexService {
                     .bookname(book.getBookname())
                     .authors(book.getAuthors())
                     .publisher(book.getPublisher())
-                    .publicationDate(book.getPublicationDate())
+                    .publicationDate(year) // ✅ 여기도 Integer 그대로!
                     .isbn13(book.getIsbn13())
-                    .description(book.getDescription())
                     .bookImageURL(book.getBookImageURL())
                     .likeCount(viewCount)
                     .reviewCount(reviewCount)
@@ -160,28 +113,20 @@ public class LibraryBookIndexService {
         }
     }
 
-    //어제 리뷰 or 조회수 바뀐 책 ID 목록 구하기(es 색인 갱신용)
     public Set<Long> getBooksWithChangedStatsYesterday() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
-        // 어제 리뷰 생성된 책 ID
         List<Long> reviewChangedBookIds = bookReviewRepository.findDistinctBookIdsByCreatedAtBetween(
                 yesterday.atStartOfDay(), today.atStartOfDay()
         );
 
-        // 어제 조회수 기록된 책 ID
         List<Long> viewedBookIds = bookViewCountLogRepository.findDistinctBookIdsByDate(yesterday);
 
-        // 둘 다 합쳐서 Set으로 중복 제거
         Set<Long> allChangedBookIds = new HashSet<>();
         allChangedBookIds.addAll(reviewChangedBookIds);
         allChangedBookIds.addAll(viewedBookIds);
 
         return allChangedBookIds;
     }
-
-
-
-
 }

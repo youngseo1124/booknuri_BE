@@ -22,8 +22,8 @@ public class BookEntity {
 
     private String publisher;
 
-    //발행날짜
-    private String publicationDate;
+    //발행년도
+    private Integer publicationDate;
 
     @Column(length = 20, unique = true)
     private String isbn13;

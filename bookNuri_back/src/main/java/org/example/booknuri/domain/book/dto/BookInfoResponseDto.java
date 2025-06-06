@@ -16,7 +16,7 @@ public class BookInfoResponseDto {
     private String bookname;
     private String authors;
     private String publisher;
-    private String publicationDate;
+    private Integer publicationDate;
     private String isbn13;
     private String description;
     private String bookImageURL;

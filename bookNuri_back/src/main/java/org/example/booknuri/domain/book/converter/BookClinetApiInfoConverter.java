@@ -30,7 +30,8 @@ public class BookClinetApiInfoConverter {
                 .bookname(bookNode.path("bookname").asText())
                 .authors(bookNode.path("authors").asText())
                 .publisher(bookNode.path("publisher").asText())
-                .publicationDate(bookNode.path("publication_date").asText())
+                .publicationDate(convertToYear(bookNode.path("publication_date").asText()))
+
                 .isbn13(bookNode.path("isbn13").asText())
                 .description(bookNode.path("description").asText())
                 .bookImageURL(bookNode.path("bookImageURL").asText())
@@ -40,6 +41,27 @@ public class BookClinetApiInfoConverter {
                 .subCategory(categoryParts.length > 2 ? categoryParts[2] : null)
                 .build();
     }
+
+    // ✨ 문자열을 연도로 파싱하는 유틸 (4자리면 변환, 아니면 null)
+    private Integer convertToYear(String str) {
+        if (str == null) return null;
+
+        str = str.trim();
+        if (str.length() >= 4) {
+            String yearPart = str.substring(0, 4);
+            if (yearPart.matches("\\d{4}")) {
+                return Integer.parseInt(yearPart);
+            }
+        }
+
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\b(19|20)\\d{2}\\b").matcher(str);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group());
+        }
+
+        return null;
+    }
+
 
     public BookEntity toEntity(BookClinetApiInfoResponseDto dto) {
         // 카테고리 이름 파싱
