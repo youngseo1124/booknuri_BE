@@ -33,7 +33,12 @@ public class BookReflectionService {
     private final MyReflectionConverter myReflectionConverter;
 
     // 내가 이미 이 책에 독후감 썼는지 확인 (true: 이미 작성함)
+    // ✅ master1124는 무조건 false 반환
     public boolean checkAlreadyReflected(String isbn13, UserEntity user) {
+        if ("master1124".equals(user.getUsername())) {
+            return false;
+        }
+
         BookEntity book = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
         return bookReflectionRepository.existsByUserAndBook(user, book);
@@ -44,9 +49,11 @@ public class BookReflectionService {
         BookEntity book = bookRepository.findByIsbn13(dto.getIsbn13())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ISBN의 책이 존재하지 않습니다."));
 
-        boolean alreadyReflected = bookReflectionRepository.existsByUserAndBook(user, book);
-        if (alreadyReflected) {
-            throw new IllegalStateException("이미 이 책에 독후감을 작성하셨습니다.");
+        if (!"master1124".equals(user.getUsername())) {
+            boolean alreadyReflected = bookReflectionRepository.existsByUserAndBook(user, book);
+            if (alreadyReflected) {
+                throw new IllegalStateException("이미 이 책에 독후감을 작성하셨습니다.");
+            }
         }
 
         log.info("isPublic 값: {}", dto.isVisibleToPublic()); // 여기에 true 찍히는지 확인!

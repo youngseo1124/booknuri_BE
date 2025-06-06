@@ -37,11 +37,16 @@ public class BookReviewService {
 
     //내가 이미 이 책에 리뷰썼는지 아닌지 확인(이미 썼으면 T, 아직 안썻으면 F반환)
     public boolean checkAlreadyReviewed(String isbn13, UserEntity user) {
+        // 👉 master1124는 항상 false 반환
+        if ("master1124".equals(user.getUsername())) {
+            return false;
+        }
+
         BookEntity book = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
+
         return bookReviewRepository.existsByUserAndBook(user, book);
     }
-
 
 
 
@@ -52,9 +57,12 @@ public class BookReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ISBN의 책이 존재하지 않습니다."));
 
         //  2. 중복 리뷰 체크
-        boolean alreadyReviewed = bookReviewRepository.existsByUserAndBook(user, book);
-        if (alreadyReviewed) {
-            throw new IllegalStateException("이미 이 책에 리뷰를 작성하셨습니다.");
+        // ✅ "master1124"가 아닌 경우만 중복 리뷰 체크
+        if (!user.getUsername().equals("master1124")) {
+            boolean alreadyReviewed = bookReviewRepository.existsByUserAndBook(user, book);
+            if (alreadyReviewed) {
+                throw new IllegalStateException("이미 이 책에 리뷰를 작성하셨습니다.");
+            }
         }
 
         // 3. 리뷰 생성 및 저장
