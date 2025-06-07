@@ -176,6 +176,20 @@ public class BookQuoteService {
 
 
 
+    //인기 인용들 구하기
+    public BookQuoteListResponseDto getPopularQuotes(int offset, int limit, UserEntity currentUser) {
+        List<BookQuoteEntity> list = bookQuoteRepository.findPopularQuotesWithRecency(offset, limit);
+        int totalCount = bookQuoteRepository.countByVisibleToPublicTrueAndIsActiveTrue();
+
+        return BookQuoteListResponseDto.builder()
+                .quotes(bookQuoteConverter.toDtoList(list, currentUser))
+                .totalCount(totalCount)
+                .build();
+    }
+
+
+
+
 
 
 

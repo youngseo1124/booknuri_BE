@@ -1,5 +1,6 @@
 package org.example.booknuri.domain.bookQuote.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -29,5 +30,30 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
     Optional<BookQuoteEntity> findByUserAndBook(UserEntity user, BookEntity book);
 
     Optional<BookQuoteEntity> findByIdAndUser(Long quoteId, UserEntity user);
+
+
+
+
+// 전체 인기순 + 최신순 반영된 인용 리스트
+
+    /*
+     - like_count * 1.0 → 실수 연산으로 점수화
+     - DATEDIFF(NOW(), created_at) → 인용 작성 후 경과 일수
+     - 최신 인용일수록 DATEDIFF 값이 작음 → * -0.1 해서 가중치 증가 효과
+
+      */
+
+    @Query(value = """
+        SELECT * FROM book_quotes
+        WHERE visible_to_public = true
+        ORDER BY (like_count * 1.0 + DATEDIFF(NOW(), created_at) * -0.1) DESC
+        LIMIT :limit OFFSET :offset
+    """, nativeQuery = true)
+    List<BookQuoteEntity> findPopularQuotesWithRecency(@Param("offset") int offset,
+                                                       @Param("limit") int limit);
+
+
+    // 전체 공개 & 활성 인용 개수 (카운트용)
+    int countByVisibleToPublicTrueAndIsActiveTrue();
 
 }

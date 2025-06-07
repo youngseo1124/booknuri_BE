@@ -97,4 +97,14 @@ public class BookQuoteController {
         }
     }
 
+    //인기인용 목록
+    @GetMapping("/popular")
+    public BookQuoteListResponseDto getPopularQuotes(@AuthenticationPrincipal CustomUser currentUser,
+                                                     @RequestParam(defaultValue = "0") int offset,
+                                                     @RequestParam(defaultValue = "10") int limit) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        return bookQuoteService.getPopularQuotes(offset, limit, user);
+    }
+
+
 }

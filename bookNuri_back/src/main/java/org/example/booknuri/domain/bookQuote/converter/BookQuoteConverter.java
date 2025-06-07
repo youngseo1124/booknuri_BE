@@ -37,6 +37,7 @@ public class BookQuoteConverter {
                 .isLikedByCurrentUser(isLiked)
                 .isWrittenByCurrentUser(isMine)
                 .visibleToPublic(entity.isVisibleToPublic())
+                .isbn13(entity.getBook().getIsbn13())
                 .build();
     }
 

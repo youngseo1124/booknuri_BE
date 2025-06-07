@@ -30,4 +30,6 @@ public class BookQuoteResponseDto {
     private boolean isWrittenByCurrentUser; // 내가 쓴 인용인지
 
     private boolean visibleToPublic;    // 👀 공개 여부 (true/false)
+
+    private String isbn13;
 }
