@@ -31,6 +31,8 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
 
     Optional<BookQuoteEntity> findByIdAndUser(Long quoteId, UserEntity user);
 
+    List<BookQuoteEntity> findAllByUserAndBook(UserEntity user, BookEntity book);
+
 
 
 

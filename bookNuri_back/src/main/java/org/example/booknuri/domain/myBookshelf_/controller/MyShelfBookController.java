@@ -2,16 +2,18 @@ package org.example.booknuri.domain.myBookshelf_.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookRequestDto;
+import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookWithExtrasResponseDto;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 import org.example.booknuri.domain.myBookshelf_.service.MyShelfBookService;
 import org.example.booknuri.global.security.entity.CustomUser;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/shelf")
+@RequestMapping("/shelf-book")
 public class MyShelfBookController {
 
     private final MyShelfBookService myShelfBookService;
@@ -20,9 +22,15 @@ public class MyShelfBookController {
     @PostMapping("/add")
     public ResponseEntity<?> addToShelf(@AuthenticationPrincipal CustomUser currentUser,
                                         @RequestBody MyShelfBookRequestDto requestDto) {
-        myShelfBookService.addToShelf(currentUser.getUsername(), requestDto.getIsbn13());
-        return ResponseEntity.ok("책장에 추가 완료!");
+        boolean added = myShelfBookService.addToShelf(currentUser.getUsername(), requestDto.getIsbn13());
+
+        if (added) {
+            return ResponseEntity.ok("책장에 추가 완료!");
+        } else {
+            return ResponseEntity.ok("이미 책장에 추가된 책입니다.");
+        }
     }
+
 
     //책장 상태 변경
     @PutMapping("/status/{isbn13}")
@@ -48,5 +56,21 @@ public class MyShelfBookController {
         myShelfBookService.removeBook(currentUser.getUsername(), isbn13);
         return ResponseEntity.ok("책장이에서 삭제되었습니다.");
     }
+
+
+    //내 책장 책 목록
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyShelfWithExtras(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) MyShelfBookEntity.BookStatus status // status는 선택
+    ) {
+        Page<MyShelfBookWithExtrasResponseDto> result =
+                myShelfBookService.getMyShelfWithExtras(currentUser.getUsername(), page, size, status);
+
+        return ResponseEntity.ok(result);
+    }
+
 
 }

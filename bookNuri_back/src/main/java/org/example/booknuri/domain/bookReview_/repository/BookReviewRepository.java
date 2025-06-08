@@ -37,6 +37,9 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
     //특정책 리뷰들 (페이지네이션 O)
     Page<BookReviewEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13, Pageable pageable);
 
+    Optional<BookReviewEntity> findByUserAndBookAndIsActiveTrue(UserEntity user, BookEntity book);
+
+
 
 
     @Query("SELECT AVG(r.rating) FROM BookReviewEntity r WHERE r.book.isbn13 = :isbn13 AND r.isActive = true")

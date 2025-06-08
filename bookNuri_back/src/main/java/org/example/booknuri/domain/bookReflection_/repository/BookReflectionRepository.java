@@ -38,4 +38,6 @@ public interface BookReflectionRepository extends JpaRepository<BookReflectionEn
 
     // 독후감 개수 조회 (isActive = true인 것만)
     int countByBook_Isbn13AndIsActiveTrue(String isbn13);
+
+    Optional<BookReflectionEntity> findByUserAndBookAndIsActiveTrue(UserEntity user, BookEntity book);
 }

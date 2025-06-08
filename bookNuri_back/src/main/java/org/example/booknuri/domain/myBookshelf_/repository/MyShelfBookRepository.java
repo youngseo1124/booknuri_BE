@@ -3,6 +3,8 @@ package org.example.booknuri.domain.myBookshelf_.repository;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -13,5 +15,13 @@ public interface MyShelfBookRepository extends JpaRepository<MyShelfBookEntity, 
     boolean existsByUserAndBook(UserEntity user, BookEntity book);
 
 
+    //응답 페이지네이션
+    Page<MyShelfBookEntity> findByUser(UserEntity user, Pageable pageable);
+
+
+
     Optional<MyShelfBookEntity> findByUserAndBook(UserEntity user, BookEntity book);
+
+    Page<MyShelfBookEntity> findByUserAndStatus(UserEntity user, MyShelfBookEntity.BookStatus status, Pageable pageable);
+
 }
