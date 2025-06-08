@@ -195,9 +195,9 @@ public class RecommendService {
     public List<RecommendBookDto> getPersonalizedRecommendation(UserEntity user) {
         String libCode = user.getMyLibrary().getLibCode();
 
-        // ✅ 1. 최근 본 책 7개 조회
+        // ✅ 1. 최근 본 책 5개 조회
         List<UserBookViewLogEntity> logs = userBookViewLogRepository
-                .findTop7ByUserOrderByViewedAtDesc(user);
+                .findTop5ByUserOrderByViewedAtDesc(user);
 
         // ✅ 2. 기록이 너무 적으면 fallback
         if (logs.size() < 3) {

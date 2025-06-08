@@ -37,6 +37,6 @@ public interface UserBookViewLogRepository extends JpaRepository<UserBookViewLog
     //최근 목록 (30개) 불러오기
     List<UserBookViewLogEntity> findTop30ByUserOrderByViewedAtDesc(UserEntity user);
 
-    // 최근 본 책 7개 가져오기 (개인 맞춤 추천용)
-    List<UserBookViewLogEntity> findTop7ByUserOrderByViewedAtDesc(UserEntity user);
+    // 최근 본 책 5개 가져오기 (개인 맞춤 추천용)
+    List<UserBookViewLogEntity> findTop5ByUserOrderByViewedAtDesc(UserEntity user);
 }

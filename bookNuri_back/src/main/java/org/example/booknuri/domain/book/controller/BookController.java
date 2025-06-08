@@ -5,7 +5,7 @@ import org.example.booknuri.domain.bookReview_.repository.BookReviewRepository;
 import org.example.booknuri.domain.bookReview_.service.BookReviewService;
 import org.example.booknuri.domain.Log.service.BookViewLogService;
 import org.example.booknuri.domain.Log.service.UserBookViewLogService;
-import org.example.booknuri.domain.myBookshelf_.repository.MyBookshelfRepository;
+import org.example.booknuri.domain.myBookshelf_.repository.MyShelfBookRepository;
 import org.example.booknuri.domain.book.converter.BookClinetApiInfoConverter;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
 import org.example.booknuri.domain.book.dto.BookTotalInfoDto;
@@ -40,7 +40,7 @@ public class BookController {
     private final UserService userService;
     private final UserBookViewLogService userBookViewLogService;
     private final BookReviewService bookReviewService;
-    private final MyBookshelfRepository myBookshelfRepository;
+    private final MyShelfBookRepository myBookshelfRepository;
 
 
     @GetMapping("/{isbn13}")
