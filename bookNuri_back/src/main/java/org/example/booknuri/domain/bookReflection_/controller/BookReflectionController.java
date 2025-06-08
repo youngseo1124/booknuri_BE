@@ -98,4 +98,17 @@ public class BookReflectionController {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
         return bookReflectionService.getReflectionsSummaryByBook(isbn13, sort, offset, limit, user);
     }
+
+    //내가 쓴 독후감 책 그룹별로 반환
+    @GetMapping("/my/grouped")
+    public ResponseEntity<MyReflectionGroupedPageResponseDto> getMyReflectionsGroupedByBook(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        MyReflectionGroupedPageResponseDto response = bookReflectionService.getMyReflectionsGroupedByBook(user, offset, limit);
+        return ResponseEntity.ok(response);
+    }
+
 }

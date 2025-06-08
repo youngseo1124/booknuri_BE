@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.booknuri.domain.bookReflection_.converter.BookReflectionConverter;
 import org.example.booknuri.domain.bookReflection_.converter.MyReflectionConverter;
+import org.example.booknuri.domain.bookReflection_.converter.MyReflectionGroupedConverter;
 import org.example.booknuri.domain.bookReflection_.dto.*;
 import org.example.booknuri.domain.bookReflection_.entity.BookReflectionEntity;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionRepository;
@@ -31,6 +32,7 @@ public class BookReflectionService {
     private final BookService bookService;
     private final BookReflectionConverter bookReflectionConverter;
     private final MyReflectionConverter myReflectionConverter;
+    private final MyReflectionGroupedConverter myReflectionGroupedConverter;
 
     // 내가 이미 이 책에 독후감 썼는지 확인 (true: 이미 작성함)
     // ✅ master1124는 무조건 false 반환
@@ -158,4 +160,24 @@ public class BookReflectionService {
 
         return map;
     }
+
+    //-----------------------------------------------------------------------------------\\
+
+    //내가 쓴 독후감 책 그룹별로묶어 반환
+    public MyReflectionGroupedPageResponseDto getMyReflectionsGroupedByBook(UserEntity user, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<BookReflectionEntity> page = bookReflectionRepository.findByUser(user, pageable);
+
+        List<MyReflectionGroupedByBookResponseDto> grouped = page.getContent().stream()
+                .map(myReflectionGroupedConverter::toDto)
+                .toList();
+
+        return MyReflectionGroupedPageResponseDto.builder()
+                .pageNumber(offset / limit)
+                .pageSize(limit)
+                .totalCount((int) page.getTotalElements())
+                .content(grouped)
+                .build();
+    }
+
 }
