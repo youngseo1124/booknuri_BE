@@ -3,6 +3,7 @@ package org.example.booknuri.domain.myBookshelf_.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookRequestDto;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookWithExtrasResponseDto;
+import org.example.booknuri.domain.myBookshelf_.dto.PagedResponse;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 import org.example.booknuri.domain.myBookshelf_.service.MyShelfBookService;
 import org.example.booknuri.global.security.entity.CustomUser;
@@ -60,17 +61,18 @@ public class MyShelfBookController {
 
     //내 책장 책 목록
     @GetMapping("/my")
-    public ResponseEntity<?> getMyShelfWithExtras(
+    public ResponseEntity<?> getMyShelf(
             @AuthenticationPrincipal CustomUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) MyShelfBookEntity.BookStatus status // status는 선택
-    ) {
-        Page<MyShelfBookWithExtrasResponseDto> result =
+            @RequestParam(required = false) MyShelfBookEntity.BookStatus status) {
+
+        PagedResponse<MyShelfBookWithExtrasResponseDto> result =
                 myShelfBookService.getMyShelfWithExtras(currentUser.getUsername(), page, size, status);
 
         return ResponseEntity.ok(result);
     }
+
 
 
 }

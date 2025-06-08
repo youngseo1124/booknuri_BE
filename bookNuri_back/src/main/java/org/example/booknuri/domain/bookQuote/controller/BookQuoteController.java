@@ -106,5 +106,17 @@ public class BookQuoteController {
         return bookQuoteService.getPopularQuotes(offset, limit, user);
     }
 
+    @GetMapping("/my/grouped")
+    public ResponseEntity<?> getMyQuotesGroupedByBook(@AuthenticationPrincipal CustomUser currentUser,
+                                                      @RequestParam(defaultValue = "0") int offset,
+                                                      @RequestParam(defaultValue = "10") int limit) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        List<MyQuoteGroupedByBookResponseDto> groupedQuotes = bookQuoteService.getMyQuotesGroupedByBook(user, offset, limit);
+        return ResponseEntity.ok(Map.of(
+                "content", groupedQuotes,
+                "totalCount", groupedQuotes.size()
+        ));
+    }
+
 
 }

@@ -8,6 +8,7 @@ import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.bookQuote.converter.BookQuoteConverter;
 import org.example.booknuri.domain.bookQuote.converter.MyQuoteConverter;
+import org.example.booknuri.domain.bookQuote.converter.MyQuoteGroupedConverter;
 import org.example.booknuri.domain.bookQuote.dto.*;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
 import org.example.booknuri.domain.bookQuote.repository.BookQuoteRepository;
@@ -25,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -36,6 +38,7 @@ public class BookQuoteService {
     private final BookRepository bookRepository;
     private final BookQuoteConverter bookQuoteConverter;
     private final MyQuoteConverter myQuoteConverter;
+    private final MyQuoteGroupedConverter myQuoteGroupedConverter;
 
     //  인용 등록
     public void createQuote(BookQuoteCreateRequestDto dto, UserEntity user) {
@@ -186,6 +189,28 @@ public class BookQuoteService {
                 .totalCount(totalCount)
                 .build();
     }
+
+
+
+
+
+   //내가 쓴 인용 책 그룹별로 묶어보기
+    public List<MyQuoteGroupedByBookResponseDto> getMyQuotesGroupedByBook(UserEntity user, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        List<Object[]> groupedBookRaw = bookQuoteRepository.findBooksByUserGroupedAndSorted(user, pageable);
+
+        List<MyQuoteGroupedByBookResponseDto> result = groupedBookRaw.stream()
+                .map(row -> {
+                    String isbn13 = (String) row[0];
+                    BookEntity book = bookRepository.findByIsbn13(isbn13).orElseThrow(() -> new IllegalArgumentException("책 없음"));
+                    List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook(user, book);
+                    return myQuoteGroupedConverter.toDto(quotes);
+                })
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
 
 
 

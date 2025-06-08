@@ -31,9 +31,8 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
 
     Optional<BookQuoteEntity> findByIdAndUser(Long quoteId, UserEntity user);
 
+    // 특정 책에 대해 내가 쓴 인용들
     List<BookQuoteEntity> findAllByUserAndBook(UserEntity user, BookEntity book);
-
-
 
 
 // 전체 인기순 + 최신순 반영된 인용 리스트
@@ -57,5 +56,21 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
 
     // 전체 공개 & 활성 인용 개수 (카운트용)
     int countByVisibleToPublicTrueAndIsActiveTrue();
+
+    // 책별 최신 인용 기준 정렬 + 페이지네이션용
+    /*q.book.isbn13로 유저가 쓴 인용들을 책별로 그룹핑하고
+    그 책에서 가장 최신 인용 작성일(MAX(createdAt)) 기준으로 내림차순 정렬해서 리스트로 가져옴!
+    결과는 각 책의 isbn13, latestQuoteAt 형태의 Object[] 리스트로 나와
+    * */
+    @Query("""
+    SELECT q.book.isbn13 AS isbn13,
+           MAX(q.createdAt) AS latestQuoteAt
+    FROM BookQuoteEntity q
+    WHERE q.user = :user
+    GROUP BY q.book.isbn13
+    ORDER BY latestQuoteAt DESC
+""")
+    List<Object[]> findBooksByUserGroupedAndSorted(@Param("user") UserEntity user, Pageable pageable);
+
 
 }

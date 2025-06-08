@@ -22,4 +22,8 @@ public class MyShelfBookResponseDto {
     private MyShelfBookEntity.BookStatus status;
     private LocalDate createdAt;
     private LocalDate finishedAt;
+
+    private int reviewCount;
+    private int quoteCount;
+    private int reflectionCount;
 }

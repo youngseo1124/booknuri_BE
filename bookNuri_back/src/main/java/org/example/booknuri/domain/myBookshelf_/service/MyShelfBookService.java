@@ -21,6 +21,7 @@ import org.example.booknuri.domain.bookReview_.service.BookReviewService;
 import org.example.booknuri.domain.myBookshelf_.converter.MyShelfBookConverter;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookResponseDto;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookWithExtrasResponseDto;
+import org.example.booknuri.domain.myBookshelf_.dto.PagedResponse;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 import org.example.booknuri.domain.myBookshelf_.repository.MyShelfBookRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -101,11 +102,12 @@ public class MyShelfBookService {
     }
 
 
-    public Page<MyShelfBookWithExtrasResponseDto> getMyShelfWithExtras(String username, int page, int size, MyShelfBookEntity.BookStatus status) {
+    public PagedResponse<MyShelfBookWithExtrasResponseDto> getMyShelfWithExtras(
+            String username, int page, int size, MyShelfBookEntity.BookStatus status) {
+
         UserEntity user = userService.getUserByUsername(username);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        // ✅ status 없으면 전체 조회, 있으면 해당 상태만 조회
         Page<MyShelfBookEntity> shelfPage = (status == null)
                 ? myShelfBookRepository.findByUser(user, pageable)
                 : myShelfBookRepository.findByUserAndStatus(user, status, pageable);
@@ -130,8 +132,15 @@ public class MyShelfBookService {
                 })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(content, pageable, shelfPage.getTotalElements());
+        return PagedResponse.<MyShelfBookWithExtrasResponseDto>builder()
+                .content(content)
+                .pageNumber(shelfPage.getNumber())
+                .pageSize(shelfPage.getSize())
+                .totalCount(shelfPage.getTotalElements())
+                .isLast(shelfPage.isLast())
+                .build();
     }
+
 
 
 
