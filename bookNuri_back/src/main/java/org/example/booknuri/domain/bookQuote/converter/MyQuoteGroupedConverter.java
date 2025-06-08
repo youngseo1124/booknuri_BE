@@ -25,6 +25,7 @@ public class MyQuoteGroupedConverter {
                         .bookTitle(first.getBook().getBookname())
                         .bookAuthor(first.getBook().getAuthors())
                         .bookImageUrl(first.getBook().getBookImageURL())
+                        .quoteCount(quoteList.size())
                         .build())
                 .quotes(quoteList.stream()
                         .map(q -> MyQuoteSimpleDto.builder()

@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -195,21 +196,33 @@ public class BookQuoteService {
 
 
    //내가 쓴 인용 책 그룹별로 묶어보기
-    public List<MyQuoteGroupedByBookResponseDto> getMyQuotesGroupedByBook(UserEntity user, int offset, int limit) {
-        Pageable pageable = PageRequest.of(offset / limit, limit);
-        List<Object[]> groupedBookRaw = bookQuoteRepository.findBooksByUserGroupedAndSorted(user, pageable);
+   public MyQuoteGroupedPageResponseDto getMyQuotesGroupedByBook(UserEntity user, int offset, int limit) {
+       Pageable pageable = PageRequest.of(offset / limit, limit);
+       List<Object[]> groupedBookRaw = bookQuoteRepository.findBooksByUserGroupedAndSorted(user, pageable);
 
-        List<MyQuoteGroupedByBookResponseDto> result = groupedBookRaw.stream()
-                .map(row -> {
-                    String isbn13 = (String) row[0];
-                    BookEntity book = bookRepository.findByIsbn13(isbn13).orElseThrow(() -> new IllegalArgumentException("책 없음"));
-                    List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook(user, book);
-                    return myQuoteGroupedConverter.toDto(quotes);
-                })
-                .collect(Collectors.toList());
+       List<MyQuoteGroupedByBookResponseDto> result = new ArrayList<>();
+       int totalQuoteCount = 0;
 
-        return result;
-    }
+       for (Object[] row : groupedBookRaw) {
+           String isbn13 = (String) row[0];
+
+           BookEntity book = bookRepository.findByIsbn13(isbn13)
+                   .orElseThrow(() -> new IllegalArgumentException("책 없음"));
+           List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook(user, book);
+
+           totalQuoteCount += quotes.size();
+           result.add(myQuoteGroupedConverter.toDto(quotes));
+       }
+
+       return MyQuoteGroupedPageResponseDto.builder()
+               .pageNumber(offset / limit)
+               .pageSize(limit)
+               .totalCount(result.size())
+               .totalQuoteCount(totalQuoteCount)
+               .content(result)
+               .build();
+   }
+
 
 
 
