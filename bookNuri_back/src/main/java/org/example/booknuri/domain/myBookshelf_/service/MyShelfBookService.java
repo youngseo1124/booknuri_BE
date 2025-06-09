@@ -103,16 +103,44 @@ public class MyShelfBookService {
 
 
     public PagedResponse<MyShelfBookWithExtrasResponseDto> getMyShelfWithExtras(
-            String username, int page, int size, MyShelfBookEntity.BookStatus status) {
-
+            String username, int page, int size,
+            MyShelfBookEntity.BookStatus status,
+            Boolean lifeBookOnly,
+            String keyword
+    ) {
         UserEntity user = userService.getUserByUsername(username);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        Page<MyShelfBookEntity> shelfPage = (status == null)
-                ? myShelfBookRepository.findByUser(user, pageable)
-                : myShelfBookRepository.findByUserAndStatus(user, status, pageable);
+        //  기본 조건 먼저 가져오고
+        List<MyShelfBookEntity> all = myShelfBookRepository.findByUser(user);
 
-        List<MyShelfBookWithExtrasResponseDto> content = shelfPage.stream()
+        // 상태 필터
+        if (status != null) {
+            all = all.stream()
+                    .filter(book -> book.getStatus() == status)
+                    .collect(Collectors.toList());
+        }
+
+        // 인생책 필터
+        if (Boolean.TRUE.equals(lifeBookOnly)) {
+            all = all.stream()
+                    .filter(MyShelfBookEntity::isLifeBook)
+                    .collect(Collectors.toList());
+        }
+
+        //  키워드 필터 (bookname like)
+        if (keyword != null && !keyword.isBlank()) {
+            all = all.stream()
+                    .filter(book -> book.getBook().getBookname().contains(keyword))
+                    .collect(Collectors.toList());
+        }
+
+        // 페이징 수동처리
+        int start = Math.min((int) pageable.getOffset(), all.size());
+        int end = Math.min(start + pageable.getPageSize(), all.size());
+        List<MyShelfBookEntity> paged = all.subList(start, end);
+
+        List<MyShelfBookWithExtrasResponseDto> content = paged.stream()
                 .map(shelf -> {
                     BookEntity book = shelf.getBook();
                     MyShelfBookResponseDto shelfDto = myShelfBookConverter.toDto(shelf);
@@ -134,12 +162,13 @@ public class MyShelfBookService {
 
         return PagedResponse.<MyShelfBookWithExtrasResponseDto>builder()
                 .content(content)
-                .pageNumber(shelfPage.getNumber())
-                .pageSize(shelfPage.getSize())
-                .totalCount(shelfPage.getTotalElements())
-                .isLast(shelfPage.isLast())
+                .pageNumber(page)
+                .pageSize(size)
+                .totalCount(all.size())
+                .isLast(end == all.size())
                 .build();
     }
+
 
 
 

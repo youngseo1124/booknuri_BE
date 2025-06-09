@@ -110,6 +110,18 @@ public class BookReviewController {
     }
 
 
+    //   (책별 그룹) 내 리뷰들
+    @GetMapping("/my/grouped")
+    public ResponseEntity<MyReviewGroupedPageResponseDto> getMyReviewsGroupedByBook(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        MyReviewGroupedPageResponseDto responseDto = bookReviewService.getMyReviewsGroupedByBook(user, offset, limit);
+        return ResponseEntity.ok(responseDto);
+    }
+
 
 
 

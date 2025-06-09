@@ -123,10 +123,69 @@ public class LibraryProcessorService {
             log.info("📚 [{}] - 소장 정보 저장 완료 (ISBN: {})", libCode, book.getIsbn13());
 
             //  Elasticsearch 색인 바로 추가!
-            libraryBookIndexService.indexSingleLibraryBook(libBook);
+    /*        libraryBookIndexService.indexSingleLibraryBook(libBook);*/
         } else {
             log.debug("🟡 [{}] - 이미 소장 정보 존재함 (ISBN: {})", libCode, book.getIsbn13());
         }
     }
+
+    @Async
+    public CompletableFuture<Void> processLibraryBooksAsync(LibraryEntity library, Integer startPage, Integer endPage) {
+
+        if (library == null) {
+            log.error("❌ 도서관 정보가 null.비동기 스킵됨");
+            return CompletableFuture.completedFuture(null);
+        }
+
+        String libCode = library.getLibCode();
+
+        try {
+            log.info("📖 [START] {} 도서관 도서 처리 시작 (startPage={}, endPage={})", libCode, startPage, endPage);
+
+            // 🆕 페이징 적용해서 API 호출
+            List<BookClinetApiInfoResponseDto> bookList =
+                    (startPage == null && endPage == null)
+                            ? apiClient.fetchBooksFromLibrary(libCode)
+                            : apiClient.fetchBooksFromLibrary(libCode,
+                            startPage == null ? 1 : startPage,
+                            endPage == null ? -1 : endPage);
+
+            log.info("📦 {} 도서관 - 도서 수집 완료 ({}권)", libCode, bookList.size());
+
+            for (BookClinetApiInfoResponseDto basicDto : bookList) {
+                String isbn = basicDto.getIsbn13();
+                String regDate = basicDto.getRegDate();
+
+                if (isbn == null || isbn.isBlank()) {
+                    log.warn("⚠️ ISBN 없음 - 스킵 (libCode: {})", libCode);
+                    continue;
+                }
+
+                try {
+                    BookEntity book = processSingleBook(isbn);
+
+                    if (book == null) {
+                        log.warn("🚫 [{}] 도서 저장 실패해서 소장정보도 패스함", isbn);
+                        continue;
+                    }
+
+                    processLibraryBookIfNeeded(libCode, regDate, book);
+
+                } catch (Exception e) {
+                    log.error("💥 [{}] 한 권 저장 중 오류 발생 - {}", isbn, e.getMessage(), e);
+                }
+            }
+
+            log.info("✅ [COMPLETE] {} 도서관 처리 완료!", libCode);
+
+        } catch (Exception e) {
+            log.error("🔥 [FAIL] {} 도서관 처리 중 전체 예외 발생: {}", libCode, e.getMessage(), e);
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+
+
 
 }

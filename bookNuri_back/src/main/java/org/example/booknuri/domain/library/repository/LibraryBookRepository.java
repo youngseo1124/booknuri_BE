@@ -16,4 +16,7 @@ public interface LibraryBookRepository extends JpaRepository<LibraryBookEntity, 
 
     // 🔍 여러 bookId에 해당하는 LibraryBook 리스트 가져오기
     List<LibraryBookEntity> findByBook_IdIn(Set<Long> bookIds);
+
+    List<LibraryBookEntity> findByLibCodeIn(List<String> libCodeList);
+
 }

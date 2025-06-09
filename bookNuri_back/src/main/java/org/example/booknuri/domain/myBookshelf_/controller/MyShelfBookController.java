@@ -65,10 +65,13 @@ public class MyShelfBookController {
             @AuthenticationPrincipal CustomUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) MyShelfBookEntity.BookStatus status) {
-
+            @RequestParam(required = false) MyShelfBookEntity.BookStatus status,
+            @RequestParam(required = false) Boolean lifeBookOnly,
+            @RequestParam(required = false) String keyword
+    ) {
         PagedResponse<MyShelfBookWithExtrasResponseDto> result =
-                myShelfBookService.getMyShelfWithExtras(currentUser.getUsername(), page, size, status);
+                myShelfBookService.getMyShelfWithExtras(
+                        currentUser.getUsername(), page, size, status, lifeBookOnly, keyword);
 
         return ResponseEntity.ok(result);
     }

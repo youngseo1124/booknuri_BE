@@ -29,17 +29,22 @@ public class LibraryBookApiClient {
     @Value("${library.api.auth-key}")
     private String authKey;
 
-    // ✅ 도서관 책 목록 수집 (도서관 코드 기반, 전체 페이지 탐색)
+    // 🔁 기본 전체 수집 (1페이지부터 끝까지)
     public List<BookClinetApiInfoResponseDto> fetchBooksFromLibrary(String libCode) {
-        log.info("[{}] 도서관 - 도서 목록 수집 시작", libCode);
+        return fetchBooksFromLibrary(libCode, 1, -1); // 시작 1, 끝 없음 (-1)
+    }
+
+    // ✅ 도서관 책 목록 수집 (시작~끝 페이지 지정 가능)
+    public List<BookClinetApiInfoResponseDto> fetchBooksFromLibrary(String libCode, int startPage, int endPage) {
+        log.info("[{}] 도서관 - 도서 목록 수집 시작 ({} ~ {})", libCode, startPage, endPage == -1 ? "끝까지" : endPage);
 
         List<BookClinetApiInfoResponseDto> results = new ArrayList<>();
-        int page = 1;
+        int page = startPage;
 
-        while (true) {
+        while (endPage == -1 || page <= endPage) {
             String responseBody = null;
 
-            // ✅ 각 page 마다 최대 3번까지 시도 (HTML 오류 응답 포함되면 실패로 간주)
+            // 각 페이지 최대 3회 재시도
             for (int i = 0; i < 3; i++) {
                 try {
                     String url = String.format(
@@ -49,26 +54,18 @@ public class LibraryBookApiClient {
                     log.info("[{}] API 요청 (page {}): {}", libCode, page, url);
                     ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
 
-                    // 응답 코드가 200대 아니면 실패로 간주
                     if (!response.getStatusCode().is2xxSuccessful()) {
                         log.warn("[{}] 요청 실패 (HTTP {})", libCode, response.getStatusCodeValue());
                         continue;
                     }
 
                     String body = response.getBody();
-
-                    // ❗ HTML 포함되면 API가 에러페이지 응답한 것 → 실패 간주
-                    if (body.contains("<html")) {
-                        log.warn("❌ [{}] page {} - HTML 응답 수신! ({}회차)", libCode, page, i + 1);
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt(); // 현재 쓰레드의 interrupted 상태를 복구
-                        }
+                    if (body == null || body.contains("<html")) {
+                        log.warn("❌ [{}] page {} - HTML 응답 or null! ({}회차)", libCode, page, i + 1);
+                        Thread.sleep(2000);
                         continue;
                     }
 
-                    // ✅ 정상 응답일 경우에만 responseBody에 저장하고 break
                     responseBody = body;
                     break;
 
@@ -77,19 +74,21 @@ public class LibraryBookApiClient {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
+                        Thread.currentThread().interrupt(); // 인터럽트 상태 복구 (좋은 습관)
                     }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return results;
                 }
             }
 
-            // ❌ 3회 모두 실패 → 다음 페이지로 skip
+            // 3회 실패 시 skip
             if (responseBody == null) {
                 log.error("🚫 [{}] page {} - HTML 포함 API 실패 3회 초과 (skip)", libCode, page);
                 page++;
                 continue;
             }
 
-            // ✅ XML 파싱 및 도서 정보 추출
             Document doc = Jsoup.parse(responseBody, "", Parser.xmlParser());
             Elements docElements = doc.select("doc");
 
@@ -117,15 +116,7 @@ public class LibraryBookApiClient {
         return results;
     }
 
-    // ✅ null-safe하게 태그에서 텍스트 추출
-    private String getSafeText(Element el, String tag) {
-        Element target = el.selectFirst(tag);
-        if (target == null) return null;
-        String text = target.text();
-        return text.equals("-") || text.isBlank() ? null : text;
-    }
-
-    // ✅ ISBN으로 도서 상세정보 조회 (JSON 응답)
+    // ✅ ISBN으로 도서 상세 정보 가져오기 (JSON)
     public JsonNode fetchBookDetailByIsbn(String isbn13) {
         String url = String.format(
                 "http://data4library.kr/api/srchDtlList?authKey=%s&isbn13=%s&loaninfoYN=Y&format=json",
@@ -140,6 +131,7 @@ public class LibraryBookApiClient {
                     log.warn("ISBN {} 상세 정보 요청 실패 (HTTP {})", isbn13, response.getStatusCodeValue());
                     continue;
                 }
+
                 responseBody = response.getBody();
                 break;
 
@@ -171,5 +163,13 @@ public class LibraryBookApiClient {
         } catch (Exception e) {
             throw new RuntimeException("도서 상세 파싱 오류: " + e.getMessage());
         }
+    }
+
+    // ✅ 안전하게 텍스트 추출
+    private String getSafeText(Element el, String tag) {
+        Element target = el.selectFirst(tag);
+        if (target == null) return null;
+        String text = target.text();
+        return text.equals("-") || text.isBlank() ? null : text;
     }
 }

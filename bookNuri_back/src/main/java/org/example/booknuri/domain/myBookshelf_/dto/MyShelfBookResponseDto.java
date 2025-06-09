@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -20,8 +21,8 @@ public class MyShelfBookResponseDto {
 
     private boolean lifeBook;
     private MyShelfBookEntity.BookStatus status;
-    private LocalDate createdAt;
-    private LocalDate finishedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime finishedAt;
 
     private int reviewCount;
     private int quoteCount;

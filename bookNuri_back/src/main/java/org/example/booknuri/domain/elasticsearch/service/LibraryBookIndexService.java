@@ -129,4 +129,34 @@ public class LibraryBookIndexService {
 
         return allChangedBookIds;
     }
+
+    public void indexLibraryBooksByLibCodes(List<String> libCodeList) {
+        List<LibraryBookEntity> books = libraryBookRepository.findByLibCodeIn(libCodeList);
+        log.info("📚 색인 대상 도서관 수: {}, 도서 수: {}", libCodeList.size(), books.size());
+
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        int pageSize = 370;
+        int totalPages = (books.size() + pageSize - 1) / pageSize;
+
+        for (int page = 0; page < totalPages; page++) {
+            final int currentPage = page;
+            executor.submit(() -> {
+                int start = currentPage * pageSize;
+                int end = Math.min(start + pageSize, books.size());
+                List<LibraryBookEntity> subList = books.subList(start, end);
+                indexWorker.indexLibraryBooksBatch(subList, currentPage); // 이 메서드는 아래에서 만들거야
+            });
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(30, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        log.info("🎉 선택된 도서관 색인 완료");
+    }
+
 }

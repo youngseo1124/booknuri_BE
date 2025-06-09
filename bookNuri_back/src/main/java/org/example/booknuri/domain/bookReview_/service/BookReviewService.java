@@ -3,6 +3,7 @@ package org.example.booknuri.domain.bookReview_.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.bookReview_.converter.MyReviewConverter;
+import org.example.booknuri.domain.bookReview_.converter.MyReviewGroupedConverter;
 import org.example.booknuri.domain.bookReview_.dto.*;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.bookReview_.entity.BookReviewEntity;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -33,11 +35,12 @@ public class BookReviewService {
     private final BookReviewConverter bookReviewConverter;
     private final MyReviewConverter myReviewConverter;
     private final BookReviewLikeService bookReviewLikeService;
+    private final MyReviewGroupedConverter myReviewGroupedConverter;
 
 
     //내가 이미 이 책에 리뷰썼는지 아닌지 확인(이미 썼으면 T, 아직 안썻으면 F반환)
     public boolean checkAlreadyReviewed(String isbn13, UserEntity user) {
-        // 👉 master1124는 항상 false 반환
+        //  master1124는 항상 false 반환
         if ("master1124".equals(user.getUsername())) {
             return false;
         }
@@ -57,7 +60,7 @@ public class BookReviewService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 ISBN의 책이 존재하지 않습니다."));
 
         //  2. 중복 리뷰 체크
-        // ✅ "master1124"가 아닌 경우만 중복 리뷰 체크
+        // "master1124"가 아닌 경우만 중복 리뷰 체크
         if (!user.getUsername().equals("master1124")) {
             boolean alreadyReviewed = bookReviewRepository.existsByUserAndBook(user, book);
             if (alreadyReviewed) {
@@ -181,6 +184,27 @@ public class BookReviewService {
 
         return map;
     }
+
+    //  내가 쓴 리뷰들을 책 기준으로 그룹화
+    public MyReviewGroupedPageResponseDto getMyReviewsGroupedByBook(UserEntity user, int offset, int limit) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+        // 최신순 정렬된 내가 쓴 리뷰들 페이징 조회
+        Page<BookReviewEntity> page = bookReviewRepository.findByUser(user, pageable);
+
+        List<MyReviewGroupedByBookResponseDto> content = page.getContent().stream()
+                .map(myReviewGroupedConverter::toDto)
+                .collect(Collectors.toList());
+
+        return MyReviewGroupedPageResponseDto.builder()
+                .pageNumber(offset / limit)
+                .pageSize(limit)
+                .totalCount((int) page.getTotalElements())
+                .totalReviewCount(content.size()) // 실제 리뷰 수
+                .content(content)
+                .build();
+    }
+
 
 
 

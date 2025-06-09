@@ -47,4 +47,16 @@ public class LibraryBookSearchController {
         indexService.indexAllLibraryBooksInBatch();
         return ResponseEntity.ok("색인 작업 완료!");
     }
+
+    //선택 도서관들 색인 추가
+    @PostMapping("/init/selected")
+    public ResponseEntity<String> initSelectedLibraries(@RequestBody List<String> libCodeList) {
+        indexService.indexLibraryBooksByLibCodes(libCodeList);
+        return ResponseEntity.ok("선택된 도서관 색인 완료!");
+    }
+/*
+    POST /library-book-search/init/selected
+["DA001", "DA002", "DA003"]*/
+
+
 }

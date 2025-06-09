@@ -7,6 +7,7 @@ import org.example.booknuri.global.DBConstruction.service.DbConstructionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,10 +28,13 @@ public class DbConStructionController {
     }
 
     // 컨트롤러에서 이렇게 호출
-    @PostMapping("/daegu-books")
-    public ResponseEntity<String> startDaeguBookJob() {
-        bookAsyncLauncher.launchDaeguSaveJob(); // ✅ 비동기로 실행됨
-        return ResponseEntity.ok("📦 도서 저장 백그라운드에서 실행 중입니다!");
+    @PostMapping("/chungnam-books")
+    public ResponseEntity<String> startChungnamBookJob(
+            @RequestParam(value = "startPage", required = false) Integer startPage,
+            @RequestParam(value = "endPage", required = false) Integer endPage
+    ) {
+        bookAsyncLauncher.launchChungnamSaveJobWithPaging(startPage, endPage);
+        return ResponseEntity.ok("📦 충청남도 도서 저장 백그라운드 실행 중!");
     }
 
 

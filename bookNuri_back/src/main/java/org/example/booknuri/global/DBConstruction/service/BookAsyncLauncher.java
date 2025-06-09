@@ -47,4 +47,24 @@ public class BookAsyncLauncher {
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
+    @Async
+    public void launchChungnamSaveJobWithPaging(Integer startPage, Integer endPage)
+    {
+        List<LibraryEntity> daeguLibraries = libraryRepository.findByRegion_Si("충청남도");
+
+        daeguLibraries = daeguLibraries.stream()
+                .filter(lib -> lib.getBookCount() != null) //  null인 도서관 제외!
+                .sorted(Comparator.comparingInt(LibraryEntity::getBookCount)) // 도서 수 오름차순
+                .skip(45) // 상위 10개 건너뛰고
+                .limit(9) // 다음 10개 가져오기
+                .toList();
+
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        for (LibraryEntity lib : daeguLibraries) {
+            futures.add(processorService.processLibraryBooksAsync(lib, startPage, endPage));
+        }
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+    }
 }

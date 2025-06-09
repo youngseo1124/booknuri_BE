@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "my_shelf_books",
@@ -33,9 +34,9 @@ public class MyShelfBookEntity {
 
     private boolean lifeBook;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
-    private LocalDate finishedAt;
+    private LocalDateTime finishedAt;
 
     public enum BookStatus {
         WANT_TO_READ, READING, FINISHED
@@ -43,7 +44,7 @@ public class MyShelfBookEntity {
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDate.now();
+        this.createdAt = LocalDateTime .now();
         if (this.status == null) this.status = BookStatus.WANT_TO_READ;
     }
 
@@ -51,7 +52,7 @@ public class MyShelfBookEntity {
     public void updateStatus(BookStatus status) {
         this.status = status;
         if (status == BookStatus.FINISHED) {
-            this.finishedAt = LocalDate.now();
+            this.finishedAt = LocalDateTime .now();
         } else {
             this.finishedAt = null;
         }

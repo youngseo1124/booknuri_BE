@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MyShelfBookRepository extends JpaRepository<MyShelfBookEntity, Long> {
@@ -17,6 +18,9 @@ public interface MyShelfBookRepository extends JpaRepository<MyShelfBookEntity, 
 
     //응답 페이지네이션
     Page<MyShelfBookEntity> findByUser(UserEntity user, Pageable pageable);
+
+    List<MyShelfBookEntity> findByUser(UserEntity user);
+
 
 
 
