@@ -1,5 +1,6 @@
 package org.example.booknuri.domain.book.controller;
 
+import org.example.booknuri.domain.book.dto.BookGroupedPageResponseDto;
 import org.example.booknuri.domain.bookReview_.converter.BookReviewConverter;
 import org.example.booknuri.domain.bookReview_.repository.BookReviewRepository;
 import org.example.booknuri.domain.bookReview_.service.BookReviewService;
@@ -19,10 +20,7 @@ import org.example.booknuri.domain.user.service.UserService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
@@ -93,5 +91,32 @@ public class BookController {
         boolean exists = bookService.existsBookByIsbn(isbn13);
         return ResponseEntity.ok(exists);
     }
+
+
+
+    /*
+    * [내가 작성한 글 기준 책 목록 조회 API]
+    GET /book/my/grouped → 사용자가 작성한 리뷰/인용/독후감 중 선택한 타입 기준으로, 작성한 책들 목록을 최신 작성일 순으로 반환하는 API (검색 키워드 + 페이징 지원)*/
+    @GetMapping("/my/grouped")
+    public ResponseEntity<?> getGroupedBooksByType(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @RequestParam(defaultValue = "review") String type,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+
+        try {
+            BookGroupedPageResponseDto response =
+                    bookService.getGroupedBooksByTypeAndKeywordSimple(user, type, keyword, offset, limit);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }

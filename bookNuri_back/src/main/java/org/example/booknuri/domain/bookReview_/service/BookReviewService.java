@@ -73,13 +73,20 @@ public class BookReviewService {
         bookReviewRepository.save(review);
     }
 
-    //리뷰 수정화면에서 기존 특정책에 대한 내 리뷰 가져올떄 쓰는 서비스
+    // 특정 책에 대한 내 리뷰를 가져올 때 사용하는 서비스
     public BookReviewResponseDto getMyReviewForBook(String isbn13, UserEntity user) {
+
         BookEntity book = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
 
+
         BookReviewEntity review = bookReviewRepository.findByUserAndBook(user, book)
-                .orElseThrow(() -> new IllegalArgumentException("작성한 리뷰가 없습니다."));
+                .orElse(null);
+
+        // 리뷰가 존재하면 DTO로 변환하여 반환하고, 없으면 null을 반환합니다.
+        if (review == null) {
+            return null;
+        }
 
         return bookReviewConverter.toDto(review, user);
     }
@@ -199,7 +206,6 @@ public class BookReviewService {
         return MyReviewGroupedPageResponseDto.builder()
                 .pageNumber(offset / limit)
                 .pageSize(limit)
-                .totalCount((int) page.getTotalElements())
                 .totalReviewCount(content.size()) // 실제 리뷰 수
                 .content(content)
                 .build();

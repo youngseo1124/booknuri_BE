@@ -65,16 +65,16 @@ public class BookReflectionService {
     }
 
     // 독후감 수정화면용: 내가 쓴 특정 책에 대한 독후감 +이미지 가져와서 dto로 반환
-    public BookReflectionResponseDto getMyReflectionForBook(String isbn13, UserEntity user) {
-        BookEntity book = bookRepository.findByIsbn13(isbn13)
-                .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
+    public BookReflectionResponseDto getMyReflectionById(Long reflectionId, UserEntity user) {
+        BookReflectionEntity reflection = bookReflectionRepository.findById(reflectionId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 독후감이 존재하지 않습니다."));
 
-        BookReflectionEntity reflection = bookReflectionRepository.findByUserAndBook(user, book)
-                .orElseThrow(() -> new IllegalArgumentException("작성한 독후감이 없습니다."));
+        if (!reflection.getUser().equals(user)) {
+            throw new SecurityException("본인의 독후감만 조회할 수 있습니다.");
+        }
 
         return bookReflectionConverter.toDto(reflection, user);
     }
-
     // 독후감 수정
     public void updateReflection(BookReflectionUpdateRequestDto dto, UserEntity user) {
         BookReflectionEntity reflection = bookReflectionRepository.findByIdAndUser(dto.getReflectionId(), user)
@@ -120,20 +120,22 @@ public class BookReflectionService {
     // 특정 책에 대한 독후감들 반환(ㅠㅔ이지네이션 o)
     public BookReflectionListResponseDto getReflectionsSummaryByBook(String isbn13, String sort, int offset, int limit, UserEntity currentUser) {
         Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
-        Page<BookReflectionEntity> page = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrue(isbn13, pageable);
+        Page<BookReflectionEntity> page = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrueAndVisibleToPublicTrue(isbn13, pageable);
         List<BookReflectionEntity> reflections = page.getContent();
 
 
 
-        Double avg = bookReflectionRepository.getAverageReflectionRatingByIsbn13(isbn13);
+        Double avg = bookReflectionRepository.getAverageReflectionRatingByIsbn13AndVisibleToPublicTrue(isbn13);
+
         double averageRating = avg != null ? Math.round(avg * 10.0) / 10.0 : 0.0;
 
-        List<BookReflectionEntity> all = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrue(isbn13);
+        List<BookReflectionEntity> all = bookReflectionRepository.findByBook_Isbn13AndIsActiveTrueAndVisibleToPublicTrue(isbn13);
         Map<Integer, Integer> ratingDistribution = getRatingBuckets(all);
 
         List<BookReflectionResponseDto> dtos = bookReflectionConverter.toDtoList(reflections, currentUser);
 
-        int totalCount = bookReflectionRepository.countByBook_Isbn13AndIsActiveTrue(isbn13);
+        int totalCount = bookReflectionRepository.countByBook_Isbn13AndIsActiveTrueAndVisibleToPublicTrue(isbn13);
+
 
         return BookReflectionListResponseDto.builder()
                 .averageRating(averageRating)
@@ -172,12 +174,39 @@ public class BookReflectionService {
                 .map(myReflectionGroupedConverter::toDto)
                 .toList();
 
+        // ✅ 전체 독후감 개수 따로 count 하기
+        int totalReflectionCount = bookReflectionRepository.countByUser(user);
+
         return MyReflectionGroupedPageResponseDto.builder()
                 .pageNumber(offset / limit)
                 .pageSize(limit)
-                .totalCount((int) page.getTotalElements())
+                .totalReflectionCount(totalReflectionCount) // ✅ 요게 빠졌던 거
                 .content(grouped)
                 .build();
+    }
+
+
+    //  특정 책에 대해 내가 쓴 모든 "활성화된" 독후감 리스트 반환
+    public List<BookReflectionResponseDto> getMyReflectionsByBook(String isbn13, UserEntity user) {
+        BookEntity book = bookRepository.findByIsbn13(isbn13)
+                .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
+
+        List<BookReflectionEntity> reflections = bookReflectionRepository.findAllByUserAndBook_Isbn13AndIsActiveTrueOrderByCreatedAtDesc(user, isbn13);
+        return bookReflectionConverter.toDtoList(reflections, user);
+    }
+
+    /**
+     *  특정 ISBN에 대해 내가 쓴 가장 최신 독후감의 ID를 반환
+     */
+    public Long getLatestReflectionIdByIsbn13(String isbn13, UserEntity user) {
+        // Pageable 객체를 생성하여 결과 수를 1로 제한 (LIMIT 1)
+        Pageable topOne = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "createdAt")); // 정렬은 @Query에서 이미 명시했지만, Pageable에도 포함하는 것이 좋습니다.
+
+        // Repository 메서드 호출
+        List<Long> ids = bookReflectionRepository.findLatestReflectionIdByUserAndBook_Isbn13(user, isbn13, topOne);
+
+        // 결과 리스트가 비어있지 않으면 첫 번째 ID 반환, 아니면 null 반환
+        return ids.isEmpty() ? null : ids.get(0);
     }
 
 }

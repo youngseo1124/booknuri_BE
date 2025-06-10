@@ -30,4 +30,8 @@ public class BookReflectionResponseDto {
 
     //이미지 url
     private List<ReflectionImageDto> imageList;
+
+    //ISBN
+    private String isbn13;
+
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,14 +49,15 @@ public class BookReflectionController {
         }
     }
 
-    // 특정 책에 대한 내 독후감 불러오기  (수정화면 불러오기용)
-    @GetMapping("/my/{isbn13}")
-    public ResponseEntity<?> getMyReflectionForBook(@PathVariable String isbn13,
-                                                    @AuthenticationPrincipal CustomUser currentUser) {
+    // 독후감 id로 조회 (수정용)
+    @GetMapping("/my/edit/{reflectionId}")
+    public ResponseEntity<?> getMyReflectionById(@PathVariable Long reflectionId,
+                                                 @AuthenticationPrincipal CustomUser currentUser) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        BookReflectionResponseDto dto = bookReflectionService.getMyReflectionForBook(isbn13, user);
+        BookReflectionResponseDto dto = bookReflectionService.getMyReflectionById(reflectionId, user);
         return ResponseEntity.ok(dto);
     }
+
 
     // 독후감 수정
     @PutMapping
@@ -110,5 +112,33 @@ public class BookReflectionController {
         MyReflectionGroupedPageResponseDto response = bookReflectionService.getMyReflectionsGroupedByBook(user, offset, limit);
         return ResponseEntity.ok(response);
     }
+
+    // 특정 책에 대해 내가 쓴 모든(활성화된)  독후감 리스트 반환
+    @GetMapping("/my/isbn/{isbn13}")
+    public ResponseEntity<List<BookReflectionResponseDto>> getMyReflectionsByBook(
+            @PathVariable String isbn13,
+            @AuthenticationPrincipal CustomUser currentUser
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        List<BookReflectionResponseDto> responseList = bookReflectionService.getMyReflectionsByBook(isbn13, user);
+        return ResponseEntity.ok(responseList);
+    }
+
+
+
+    /**
+     *  특정 ISBN에 대해 내가 쓴 가장 최신 독후감의 ID를 반환하는 API
+     */
+    @GetMapping("/my/latest-id/{isbn13}")
+    public ResponseEntity<Map<String, Long>> getLatestMyReflectionIdByIsbn(
+            @PathVariable String isbn13,
+            @AuthenticationPrincipal CustomUser currentUser
+    ) {
+        UserEntity user = userService.getUserByUsername(currentUser.getUsername());
+        Long reflectionId = bookReflectionService.getLatestReflectionIdByIsbn13(isbn13, user);
+
+        return ResponseEntity.ok(Map.of("reflectionId", Optional.ofNullable(reflectionId).orElse(null)));
+    }
+
 
 }

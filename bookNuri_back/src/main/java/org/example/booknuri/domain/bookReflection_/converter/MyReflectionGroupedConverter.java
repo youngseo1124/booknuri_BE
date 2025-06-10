@@ -20,17 +20,7 @@ public class MyReflectionGroupedConverter {
                         .bookImageUrl(reflection.getBook().getBookImageURL())
                         .reflectionCount(1) // 한 권당 하나만 가능
                         .build())
-                .reflection(MyReflectionSimpleDto.builder()
-                        .reflectionId(reflection.getId())
-                        .title(reflection.getTitle())
-                        .content(reflection.getContent())
-                        .createdAt(reflection.getCreatedAt())
-                        .updatedAt(reflection.getUpdatedAt())
-                        .rating(reflection.getRating())
-                        .likeCount(reflection.getLikeCount())
-                        .containsSpoiler(reflection.isContainsSpoiler())
-                        .visibleToPublic(reflection.isVisibleToPublic())
-                        .build())
+
                 .build();
     }
 }

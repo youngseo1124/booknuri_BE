@@ -1,6 +1,8 @@
 package org.example.booknuri.domain.bookReview_.repository;
 
 
+import aj.org.objectweb.asm.commons.Remapper;
+import io.lettuce.core.ScanIterator;
 import org.example.booknuri.domain.bookReview_.entity.BookReviewEntity;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -65,4 +67,11 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
 
 
     int countByBookAndUserAndIsActiveTrue(BookEntity book, UserEntity user);
+
+    List<BookReviewEntity> findAllByUserAndIsActiveTrue(UserEntity user);
+
+
+    Optional<BookReviewEntity> findTopByUserAndBookAndIsActiveTrueOrderByCreatedAtDesc(UserEntity user, BookEntity book);
+
+    int countByUserAndBookAndIsActiveTrue(UserEntity user, BookEntity book);
 }

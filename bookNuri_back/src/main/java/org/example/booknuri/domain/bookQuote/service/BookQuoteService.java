@@ -97,7 +97,7 @@ public class BookQuoteService {
         Pageable pageable = PageRequest.of(offset / limit, limit, getSortOrder(sort));
         Page<BookQuoteEntity> page = bookQuoteRepository.findByBook_Isbn13AndVisibleToPublicTrue(isbn13, pageable);
 
-        int totalCount = bookQuoteRepository.countByBook_Isbn13AndIsActiveTrue(isbn13);
+        int totalCount = bookQuoteRepository.countByBook_Isbn13AndIsActiveTrueAndVisibleToPublicTrue(isbn13);
 
         return BookQuoteListResponseDto.builder()
                 .quotes(bookQuoteConverter.toDtoList(page.getContent(), currentUser))
@@ -198,26 +198,30 @@ public class BookQuoteService {
    //내가 쓴 인용 책 그룹별로 묶어보기
    public MyQuoteGroupedPageResponseDto getMyQuotesGroupedByBook(UserEntity user, int offset, int limit) {
        Pageable pageable = PageRequest.of(offset / limit, limit);
+
+       // ✅ 1. 사용자 전체 인용 개수 먼저 세기
+       int totalQuoteCount = bookQuoteRepository.countByUser(user);
+
+       // ✅ 2. 페이지네이션 적용해서 책별로 그룹 조회
        List<Object[]> groupedBookRaw = bookQuoteRepository.findBooksByUserGroupedAndSorted(user, pageable);
 
        List<MyQuoteGroupedByBookResponseDto> result = new ArrayList<>();
-       int totalQuoteCount = 0;
 
        for (Object[] row : groupedBookRaw) {
            String isbn13 = (String) row[0];
 
            BookEntity book = bookRepository.findByIsbn13(isbn13)
                    .orElseThrow(() -> new IllegalArgumentException("책 없음"));
+
            List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook(user, book);
 
-           totalQuoteCount += quotes.size();
            result.add(myQuoteGroupedConverter.toDto(quotes));
        }
 
        return MyQuoteGroupedPageResponseDto.builder()
                .pageNumber(offset / limit)
                .pageSize(limit)
-               .totalCount(result.size())
+               .totalCount(groupedBookRaw.size())
                .totalQuoteCount(totalQuoteCount)
                .content(result)
                .build();
@@ -225,14 +229,16 @@ public class BookQuoteService {
 
 
 
+
     // BookQuoteService.java
     public List<BookQuoteResponseDto> getMyQuotesByBook(String isbn13, UserEntity user) {
-        List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook_Isbn13AndIsActiveTrue(user, isbn13);
+        List<BookQuoteEntity> quotes = bookQuoteRepository
+                .findAllByUserAndBook_Isbn13AndIsActiveTrueOrderByCreatedAtDesc(user, isbn13);
+
         return quotes.stream()
                 .map(q -> bookQuoteConverter.toDto(q, user))
                 .collect(Collectors.toList());
     }
-
 
 
 

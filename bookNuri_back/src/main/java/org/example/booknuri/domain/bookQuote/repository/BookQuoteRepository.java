@@ -1,8 +1,11 @@
 package org.example.booknuri.domain.bookQuote.repository;
 
+import aj.org.objectweb.asm.commons.Remapper;
+import io.lettuce.core.ScanIterator;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
+import org.example.booknuri.domain.bookReview_.entity.BookReviewEntity;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,4 +80,18 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
     List<BookQuoteEntity> findAllByUserAndBook_Isbn13AndIsActiveTrue(UserEntity user, String isbn13);
 
     int countByBookAndUser(BookEntity book, UserEntity user);
+
+    int countByBook_Isbn13AndIsActiveTrueAndVisibleToPublicTrue(String isbn13);
+
+    List<BookQuoteEntity> findAllByUserAndBook_Isbn13AndIsActiveTrueOrderByCreatedAtDesc(UserEntity user, String isbn13);
+
+    int countByUser(UserEntity user);
+
+
+
+    List<BookQuoteEntity> findAllByUserAndIsActiveTrue(UserEntity user);
+
+    Optional<BookQuoteEntity> findTopByUserAndBookAndIsActiveTrueOrderByCreatedAtDesc(UserEntity user, BookEntity book);;
+
+    int countByUserAndBook(UserEntity user, BookEntity book);
 }

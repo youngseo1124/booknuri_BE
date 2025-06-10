@@ -159,14 +159,14 @@ public class MyShelfBookService {
                     BookReviewResponseDto reviewDto = (review != null) ? bookReviewConverter.toDto(review, user) : null;
                     List<BookQuoteEntity> quoteList = bookQuoteRepository.findAllByUserAndBook(user, book);
                     List<BookQuoteResponseDto> quoteDtos = bookQuoteConverter.toDtoList(quoteList, user);
-                    BookReflectionEntity reflection = bookReflectionRepository.findByUserAndBookAndIsActiveTrue(user, book).orElse(null);
-                    BookReflectionResponseDto reflectionDto = (reflection != null) ? bookReflectionConverter.toDto(reflection, user) : null;
+
+
 
                     return MyShelfBookWithExtrasResponseDto.builder()
                             .shelfInfo(shelfDto)
                             .myReview(reviewDto)
                             .myQuotes(quoteDtos)
-                            .myReflection(reflectionDto)
+
                             .build();
                 })
                 .collect(Collectors.toList());

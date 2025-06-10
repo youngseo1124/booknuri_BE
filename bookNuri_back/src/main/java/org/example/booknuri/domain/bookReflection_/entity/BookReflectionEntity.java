@@ -13,10 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Table(
-        name = "book_reflections",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "book_id"})
-        }
+        name = "book_reflections"
 )
 public class BookReflectionEntity {
 

@@ -47,6 +47,7 @@ public class BookReflectionConverter {
                 .isWrittenByCurrentUser(isMine)
                 .containsSpoiler(entity.isContainsSpoiler())
                 .visibleToPublic(entity.isVisibleToPublic())
+                .isbn13(entity.getBook().getIsbn13())
                 .imageList(imageList)
                 .build();
     }
