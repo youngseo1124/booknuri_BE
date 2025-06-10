@@ -117,6 +117,16 @@ public class BookQuoteController {
         return ResponseEntity.ok(responseDto);
     }
 
+    //특정 책에 대한 내 인용들
+    // BookQuoteController.java
+    @GetMapping("/my/isbn/{isbn13}")
+    public ResponseEntity<List<BookQuoteResponseDto>> getMyQuotesByIsbn(
+            @PathVariable String isbn13,
+            @AuthenticationPrincipal CustomUser user) {
+        List<BookQuoteResponseDto> quotes = bookQuoteService.getMyQuotesByBook(isbn13, user.getUser());
+        return ResponseEntity.ok(quotes);
+    }
+
 
 
 }

@@ -73,4 +73,7 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
     List<Object[]> findBooksByUserGroupedAndSorted(@Param("user") UserEntity user, Pageable pageable);
 
 
+    // BookQuoteRepository.java
+    List<BookQuoteEntity> findAllByUserAndBook_Isbn13AndIsActiveTrue(UserEntity user, String isbn13);
+
 }

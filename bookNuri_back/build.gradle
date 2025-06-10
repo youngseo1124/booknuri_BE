@@ -135,4 +135,5 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE3NDk0MTM3M
 
 
 ###
-POST http://localhost:8080/db/daegu-books?startPage=1&endPage=20*/
+POST http://localhost:8080/db/chungnam-books?startPage=1&endPage=20
+*/

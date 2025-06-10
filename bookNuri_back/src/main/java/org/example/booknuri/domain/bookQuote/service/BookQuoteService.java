@@ -225,6 +225,16 @@ public class BookQuoteService {
 
 
 
+    // BookQuoteService.java
+    public List<BookQuoteResponseDto> getMyQuotesByBook(String isbn13, UserEntity user) {
+        List<BookQuoteEntity> quotes = bookQuoteRepository.findAllByUserAndBook_Isbn13AndIsActiveTrue(user, isbn13);
+        return quotes.stream()
+                .map(q -> bookQuoteConverter.toDto(q, user))
+                .collect(Collectors.toList());
+    }
+
+
+
 
 
 

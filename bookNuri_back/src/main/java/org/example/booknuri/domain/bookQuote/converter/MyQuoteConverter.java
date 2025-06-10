@@ -3,6 +3,7 @@ package org.example.booknuri.domain.bookQuote.converter;
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.bookQuote.dto.BookQuoteResponseDto;
 import org.example.booknuri.domain.bookQuote.dto.MyQuoteResponseDto;
+import org.example.booknuri.domain.bookQuote.dto.MyQuoteSimpleDto;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
 import org.example.booknuri.domain.bookReview_.dto.MyReviewResponseDto;
 import org.example.booknuri.domain.bookReview_.entity.BookReviewEntity;
@@ -47,4 +48,22 @@ public class MyQuoteConverter {
                 .map(entity -> toDto(entity, currentUser)) // 단일 변환 재사용
                 .collect(Collectors.toList());
     }
+
+    // MyQuoteConverter.java
+    public List<MyQuoteSimpleDto> toSimpleDtoList(List<BookQuoteEntity> entities) {
+        return entities.stream()
+                .map(entity -> MyQuoteSimpleDto.builder()
+                        .quoteId(entity.getId())
+                        .quoteText(entity.getQuoteText())
+                        .createdAt(entity.getCreatedAt())
+                        .updatedAt(entity.getUpdatedAt())
+                        .likeCount(entity.getLikeCount())
+                        .fontScale(entity.getFontScale())
+                        .fontColor(entity.getFontColor())
+                        .backgroundId(entity.getBackgroundId())
+                        .visibleToPublic(entity.isVisibleToPublic())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }

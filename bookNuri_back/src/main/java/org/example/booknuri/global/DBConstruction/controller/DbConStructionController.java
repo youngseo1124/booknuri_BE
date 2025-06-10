@@ -27,7 +27,7 @@ public class DbConStructionController {
         return ResponseEntity.ok("도서관 데이터 DB 저장 완료!");
     }
 
-    // 컨트롤러에서 이렇게 호출
+
     @PostMapping("/chungnam-books")
     public ResponseEntity<String> startChungnamBookJob(
             @RequestParam(value = "startPage", required = false) Integer startPage,

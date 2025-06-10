@@ -30,6 +30,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,7 +112,7 @@ public class MyShelfBookService {
         UserEntity user = userService.getUserByUsername(username);
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        //  기본 조건 먼저 가져오고
+        // 기본 조건 먼저 가져오고
         List<MyShelfBookEntity> all = myShelfBookRepository.findByUser(user);
 
         // 상태 필터
@@ -128,12 +129,17 @@ public class MyShelfBookService {
                     .collect(Collectors.toList());
         }
 
-        //  키워드 필터 (bookname like)
+        // 키워드 필터 (bookname like)
         if (keyword != null && !keyword.isBlank()) {
             all = all.stream()
                     .filter(book -> book.getBook().getBookname().contains(keyword))
                     .collect(Collectors.toList());
         }
+
+        //  최신순 정렬 추가
+        all = all.stream()
+                .sorted(Comparator.comparing(MyShelfBookEntity::getCreatedAt).reversed())
+                .collect(Collectors.toList());
 
         // 페이징 수동처리
         int start = Math.min((int) pageable.getOffset(), all.size());
@@ -168,6 +174,7 @@ public class MyShelfBookService {
                 .isLast(end == all.size())
                 .build();
     }
+
 
 
 
