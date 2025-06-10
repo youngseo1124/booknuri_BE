@@ -2,6 +2,7 @@ package org.example.booknuri.domain.myBookshelf_.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookRequestDto;
+import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookResponseDto;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookWithExtrasResponseDto;
 import org.example.booknuri.domain.myBookshelf_.dto.PagedResponse;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,6 +77,15 @@ public class MyShelfBookController {
                         currentUser.getUsername(), page, size, status, lifeBookOnly, keyword);
 
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/my/info/{isbn13}")
+    public ResponseEntity<?> getShelfInfoOnlyByIsbn(
+            @AuthenticationPrincipal CustomUser currentUser,
+            @PathVariable String isbn13
+    ) {
+        MyShelfBookResponseDto shelfInfo = myShelfBookService.getShelfInfoOnly(currentUser.getUsername(), isbn13);
+        return ResponseEntity.ok(Map.of("shelfInfo", shelfInfo));
     }
 
 

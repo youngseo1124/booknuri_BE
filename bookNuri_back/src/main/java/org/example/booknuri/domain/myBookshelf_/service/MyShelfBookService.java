@@ -175,6 +175,15 @@ public class MyShelfBookService {
                 .build();
     }
 
+    public MyShelfBookResponseDto getShelfInfoOnly(String username, String isbn13) {
+        UserEntity user = userService.getUserByUsername(username);
+        BookEntity book = bookService.getBookEntityByIsbn(isbn13);
+        MyShelfBookEntity entity = myShelfBookRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new IllegalArgumentException("책장이에 존재하지 않는 책입니다."));
+        return myShelfBookConverter.toDto(entity);
+    }
+
+
 
 
 
