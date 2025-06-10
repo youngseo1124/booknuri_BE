@@ -76,4 +76,5 @@ public interface BookQuoteRepository extends JpaRepository<BookQuoteEntity, Long
     // BookQuoteRepository.java
     List<BookQuoteEntity> findAllByUserAndBook_Isbn13AndIsActiveTrue(UserEntity user, String isbn13);
 
+    int countByBookAndUser(BookEntity book, UserEntity user);
 }

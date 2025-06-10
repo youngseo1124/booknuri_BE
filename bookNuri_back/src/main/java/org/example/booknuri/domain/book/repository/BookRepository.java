@@ -18,6 +18,5 @@ public interface BookRepository extends JpaRepository<BookEntity, Long> {
 
 
 
-    // Optional 없이 바로 반환!
-    BookEntity getByIsbn13(String isbn13);  // Optional 없이 바로 반환!
+
 }

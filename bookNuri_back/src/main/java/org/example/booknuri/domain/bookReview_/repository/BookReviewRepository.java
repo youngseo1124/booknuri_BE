@@ -64,5 +64,5 @@ public interface BookReviewRepository extends JpaRepository<BookReviewEntity, Lo
 
 
 
-
+    int countByBookAndUserAndIsActiveTrue(BookEntity book, UserEntity user);
 }

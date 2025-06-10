@@ -34,16 +34,17 @@ public class BookReflectionService {
     private final MyReflectionConverter myReflectionConverter;
     private final MyReflectionGroupedConverter myReflectionGroupedConverter;
 
-    // 내가 이미 이 책에 독후감 썼는지 확인 (true: 이미 작성함)
-    // ✅ master1124는 무조건 false 반환
-    public boolean checkAlreadyReflected(String isbn13, UserEntity user) {
+    // 내가 이미 이 책에 공개 독후감 썼는지 확인 (true: 이미 작성함)
+    // master1124는 무조건 false 반환
+    public boolean checkAlreadyPublicReflected(String isbn13, UserEntity user) {
         if ("master1124".equals(user.getUsername())) {
             return false;
         }
 
         BookEntity book = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("책이 존재하지 않습니다."));
-        return bookReflectionRepository.existsByUserAndBook(user, book);
+
+        return bookReflectionRepository.existsByUserAndBookAndVisibleToPublicTrue(user, book);
     }
 
     // 독후감 쓰기
@@ -51,14 +52,13 @@ public class BookReflectionService {
         BookEntity book = bookRepository.findByIsbn13(dto.getIsbn13())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ISBN의 책이 존재하지 않습니다."));
 
-        if (!"master1124".equals(user.getUsername())) {
-            boolean alreadyReflected = bookReflectionRepository.existsByUserAndBook(user, book);
-            if (alreadyReflected) {
-                throw new IllegalStateException("이미 이 책에 독후감을 작성하셨습니다.");
+        //공개 독후감이면 1개만 작성 가능하도록 체크
+        if (!"master1124".equals(user.getUsername()) && dto.isVisibleToPublic()) {
+            boolean alreadyPublic = bookReflectionRepository.existsByUserAndBookAndVisibleToPublicTrue(user, book);
+            if (alreadyPublic) {
+                throw new IllegalStateException("이미 이 책에 공개 독후감을 작성하셨습니다.");
             }
         }
-
-        log.info("isPublic 값: {}", dto.isVisibleToPublic()); // 여기에 true 찍히는지 확인!
 
         BookReflectionEntity reflection = bookReflectionConverter.toEntity(dto, book, user);
         bookReflectionRepository.save(reflection);

@@ -30,7 +30,7 @@ public class BookReflectionController {
             @AuthenticationPrincipal CustomUser currentUser
     ) {
         UserEntity user = userService.getUserByUsername(currentUser.getUsername());
-        boolean alreadyReflected = bookReflectionService.checkAlreadyReflected(isbn13, user);
+        boolean alreadyReflected = bookReflectionService.checkAlreadyPublicReflected(isbn13, user);
         return ResponseEntity.ok(Map.of("alreadyReflected", alreadyReflected));
     }
 

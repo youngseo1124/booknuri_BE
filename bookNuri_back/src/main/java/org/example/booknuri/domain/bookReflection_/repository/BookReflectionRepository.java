@@ -14,6 +14,9 @@ import java.util.Optional;
 
 public interface BookReflectionRepository extends JpaRepository<BookReflectionEntity, Long> {
 
+    boolean existsByUserAndBookAndVisibleToPublicTrue(UserEntity user, BookEntity book);
+
+
     // 특정 ISBN의 책 독후감 리스트 (활성화된 것만)
     List<BookReflectionEntity> findByBook_Isbn13AndIsActiveTrue(String isbn13);
 
@@ -40,4 +43,6 @@ public interface BookReflectionRepository extends JpaRepository<BookReflectionEn
     int countByBook_Isbn13AndIsActiveTrue(String isbn13);
 
     Optional<BookReflectionEntity> findByUserAndBookAndIsActiveTrue(UserEntity user, BookEntity book);
+
+    int countByBookAndUserAndIsActiveTrue(BookEntity book, UserEntity user);
 }

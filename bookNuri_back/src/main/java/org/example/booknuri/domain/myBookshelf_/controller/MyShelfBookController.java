@@ -80,13 +80,14 @@ public class MyShelfBookController {
     }
 
     @GetMapping("/my/info/{isbn13}")
-    public ResponseEntity<?> getShelfInfoOnlyByIsbn(
+    public ResponseEntity<Map<String, MyShelfBookResponseDto>> getShelfInfoOnlyByIsbn(
             @AuthenticationPrincipal CustomUser currentUser,
             @PathVariable String isbn13
     ) {
-        MyShelfBookResponseDto shelfInfo = myShelfBookService.getShelfInfoOnly(currentUser.getUsername(), isbn13);
-        return ResponseEntity.ok(Map.of("shelfInfo", shelfInfo));
+        Map<String, MyShelfBookResponseDto> shelfInfoMap = myShelfBookService.getMyShelfBookInfo(currentUser.getUsername(), isbn13);
+        return ResponseEntity.ok(shelfInfoMap);
     }
+
 
 
 

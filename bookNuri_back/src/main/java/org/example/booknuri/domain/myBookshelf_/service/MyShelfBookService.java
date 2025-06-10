@@ -2,6 +2,7 @@ package org.example.booknuri.domain.myBookshelf_.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.book.entity.BookEntity;
+import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.book.service.BookService;
 import org.example.booknuri.domain.bookQuote.converter.BookQuoteConverter;
 import org.example.booknuri.domain.bookQuote.dto.BookQuoteResponseDto;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -45,11 +47,14 @@ public class MyShelfBookService {
     private final BookService bookService;
     private final MyShelfBookConverter myShelfBookConverter;
     private final BookReviewRepository bookReviewRepository;
+    private final BookRepository bookRepository;
     private final BookReflectionRepository bookReflectionRepository;
     private final BookQuoteRepository bookQuoteRepository;
     private final BookQuoteConverter bookQuoteConverter;
     private final BookReviewConverter bookReviewConverter;
     private final BookReflectionConverter bookReflectionConverter;
+    private final MyShelfBookRepository shelfBookRepository;
+
 
 
     public boolean addToShelf(String username, String isbn13) {
@@ -175,13 +180,36 @@ public class MyShelfBookService {
                 .build();
     }
 
-    public MyShelfBookResponseDto getShelfInfoOnly(String username, String isbn13) {
+    public Map<String, MyShelfBookResponseDto> getMyShelfBookInfo(String username, String isbn13) {
         UserEntity user = userService.getUserByUsername(username);
-        BookEntity book = bookService.getBookEntityByIsbn(isbn13);
-        MyShelfBookEntity entity = myShelfBookRepository.findByUserAndBook(user, book)
-                .orElseThrow(() -> new IllegalArgumentException("책장이에 존재하지 않는 책입니다."));
-        return myShelfBookConverter.toDto(entity);
+
+        BookEntity book = bookRepository.findByIsbn13(isbn13)
+                .orElseThrow(() -> new IllegalArgumentException("책 정보를 찾을 수 없습니다."));
+
+        MyShelfBookEntity shelfBook = shelfBookRepository.findByUserAndBook(user, book)
+                .orElseThrow(() -> new IllegalArgumentException("사용자의 책장에서 해당 책을 찾을 수 없습니다."));
+
+        int reviewCount = bookReviewRepository.countByBookAndUserAndIsActiveTrue(book, user);
+        int quoteCount = bookQuoteRepository.countByBookAndUser(book, user);
+        int reflectionCount = bookReflectionRepository.countByBookAndUserAndIsActiveTrue(book, user);
+
+        MyShelfBookResponseDto dto = MyShelfBookResponseDto.builder()
+                .isbn13(book.getIsbn13())
+                .bookname(book.getBookname())
+                .authors(book.getAuthors())
+                .bookImageURL(book.getBookImageURL())
+                .lifeBook(shelfBook.isLifeBook())
+                .status(shelfBook.getStatus())
+                .createdAt(shelfBook.getCreatedAt())
+                .finishedAt(shelfBook.getFinishedAt())
+                .reviewCount(reviewCount)
+                .quoteCount(quoteCount)
+                .reflectionCount(reflectionCount)
+                .build();
+
+        return Map.of("shelfInfo", dto);
     }
+
 
 
 
