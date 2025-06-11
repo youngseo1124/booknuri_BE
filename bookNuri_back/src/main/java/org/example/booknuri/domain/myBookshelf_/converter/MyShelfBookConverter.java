@@ -7,6 +7,7 @@ import org.example.booknuri.domain.bookQuote.repository.BookQuoteRepository;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionRepository;
 import org.example.booknuri.domain.bookReview_.repository.BookReviewRepository;
 import org.example.booknuri.domain.myBookshelf_.dto.MyShelfBookResponseDto;
+import org.example.booknuri.domain.myBookshelf_.dto.MyShelfSimpleBookResponseDto;
 import org.example.booknuri.domain.myBookshelf_.entity.MyShelfBookEntity;
 import org.springframework.stereotype.Component;
 
@@ -43,4 +44,20 @@ public class MyShelfBookConverter {
                 .reflectionCount(reflectionCount)
                 .build();
     }
+
+    public MyShelfSimpleBookResponseDto toSimpleDto(MyShelfBookEntity entity) {
+        BookEntity book = entity.getBook();
+
+        return MyShelfSimpleBookResponseDto.builder()
+                .isbn13(book.getIsbn13())
+                .bookname(book.getBookname())
+                .authors(book.getAuthors())
+                .bookImageURL(book.getBookImageURL())
+                .lifeBook(entity.isLifeBook())
+                .status(entity.getStatus())
+                .createdAt(entity.getCreatedAt())
+                .finishedAt(entity.getFinishedAt())
+                .build();
+    }
+
 }

@@ -64,14 +64,12 @@ public class BookReflectionService {
         bookReflectionRepository.save(reflection);
     }
 
-    // 독후감 수정화면용: 내가 쓴 특정 책에 대한 독후감 +이미지 가져와서 dto로 반환
+    // 내가 쓴 특정 책에 대한 독후감 +이미지 가져와서 dto로 반환
     public BookReflectionResponseDto getMyReflectionById(Long reflectionId, UserEntity user) {
         BookReflectionEntity reflection = bookReflectionRepository.findById(reflectionId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 독후감이 존재하지 않습니다."));
 
-        if (!reflection.getUser().equals(user)) {
-            throw new SecurityException("본인의 독후감만 조회할 수 있습니다.");
-        }
+
 
         return bookReflectionConverter.toDto(reflection, user);
     }

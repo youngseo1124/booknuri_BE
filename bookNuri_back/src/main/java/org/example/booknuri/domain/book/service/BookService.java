@@ -135,7 +135,7 @@ public class BookService {
         return BookGroupedPageResponseDto.builder()
                 .pageNumber(offset / limit)
                 .pageSize(limit)
-                .totalCount(dedupedBooks.size())
+                .totalCount(books.size())
                 .content(content)
                 .build();
     }
