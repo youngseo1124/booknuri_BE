@@ -1,8 +1,13 @@
 package org.example.booknuri.domain.library.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.library.entity.LibraryBookEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,5 +23,13 @@ public interface LibraryBookRepository extends JpaRepository<LibraryBookEntity, 
     List<LibraryBookEntity> findByBook_IdIn(Set<Long> bookIds);
 
     List<LibraryBookEntity> findByLibCodeIn(List<String> libCodeList);
+
+    long countByLibCodeIn(List<String> libCodeList);
+
+    Page<LibraryBookEntity> findByLibCodeIn(List<String> libCodeList, Pageable pageable);
+
+    @Query("SELECT lb FROM LibraryBookEntity lb JOIN FETCH lb.book WHERE lb.libCode IN :libCodeList")
+    Page<LibraryBookEntity> findByLibCodeInFetchBook(@Param("libCodeList") List<String> libCodeList, Pageable pageable);
+
 
 }

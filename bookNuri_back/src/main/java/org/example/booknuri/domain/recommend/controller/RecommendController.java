@@ -49,4 +49,18 @@ public class RecommendController {
     }
 
 
+    //카테고리 기반 추천
+    @GetMapping("/bestseller/category")
+    public List<RecommendBookDto> getCategoryBasedRecommend(
+            @AuthenticationPrincipal CustomUser jwtuser,
+            @RequestParam("mainCategoryName") String mainCategoryName,
+            @RequestParam(value = "middleCategoryName", required = false) String middleCategoryName,
+            @RequestParam(value = "subCategoryName", required = false) String subCategoryName
+    ) {
+        UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
+        return recommendService.getCategoryBasedRecommend(user, mainCategoryName, middleCategoryName, subCategoryName);
+    }
+
+
+
 }

@@ -28,4 +28,9 @@ public class LibraryBookSearchDocument {
 
     private int likeCount;
     private int reviewCount;
+
+    // ✅ 추가된 카테고리
+    private Long mainCategoryId;
+    private Long middleCategoryId;
+    private Long subCategoryId;
 }

@@ -9,6 +9,8 @@ import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserBookViewLogService {
@@ -35,4 +37,13 @@ public class UserBookViewLogService {
         // 30개 초과 시 삭제
         userBookViewLogRepository.deleteExceedingLimit(user.getUsername());
     }
+
+    @Transactional
+    public List<BookEntity> getRecentViewedBooks(UserEntity user) {
+        return userBookViewLogRepository.findTop30ByUserOrderByViewedAtDesc(user)
+                .stream()
+                .map(UserBookViewLogEntity::getBook)
+                .toList();
+    }
+
 }

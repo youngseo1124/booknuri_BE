@@ -8,6 +8,11 @@ import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
+import java.util.List;
+
+import org.example.booknuri.domain.Log.entity.UserBookViewLogEntity;
+import org.example.booknuri.domain.Log.repository.UserBookViewLogRepository;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +22,7 @@ import java.time.LocalDateTime;
 public class BookViewLogService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final UserBookViewLogRepository userBookViewLogRepository;
 
     //- 유저가 책을 조회했을 때 실행됨!
     //레디스
@@ -42,4 +48,6 @@ public class BookViewLogService {
             log.error("🚨 Redis 로그 저장 실패", e);
         }
     }
+
+
 }

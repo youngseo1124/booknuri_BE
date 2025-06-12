@@ -122,6 +122,9 @@ public class LibraryBookIndexWorker {
                                 .bookImageURL(book.getBookImageURL())
                                 .likeCount(viewCount)
                                 .reviewCount(reviewCount)
+                                .mainCategoryId(book.getMainCategory().getId())
+                                .middleCategoryId(book.getMiddleCategory().getId())
+                                .subCategoryId(book.getSubCategory().getId())
                                 .build();
                     } catch (Exception e) {
                         log.warn("❌ 색인 오류: " + e.getMessage());
@@ -177,6 +180,9 @@ public class LibraryBookIndexWorker {
                                 .bookImageURL(book.getBookImageURL())
                                 .likeCount(viewCount)
                                 .reviewCount(reviewCount)
+                                .mainCategoryId(book.getMainCategory().getId())
+                                .middleCategoryId(book.getMiddleCategory().getId())
+                                .subCategoryId(book.getSubCategory().getId())
                                 .build();
                     } catch (Exception e) {
                         log.warn("❌ 색인 오류: {}", e.getMessage());

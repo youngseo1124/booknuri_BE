@@ -3,6 +3,7 @@ package org.example.booknuri.domain.book.converter;
 import lombok.RequiredArgsConstructor;
 import org.example.booknuri.domain.book.dto.BookInfoDto;
 import org.example.booknuri.domain.book.dto.BookInfoResponseDto;
+import org.example.booknuri.domain.book.dto.BookSimpleInfoDto;
 import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.bookQuote.repository.BookQuoteRepository;
 import org.example.booknuri.domain.bookReflection_.repository.BookReflectionRepository;
@@ -49,5 +50,16 @@ public class BookConverter {
                 .reflectionCount(reflectionCount)
                 .build();
     }
+
+
+    public BookSimpleInfoDto toBookSimpleInfoDto(BookEntity book) {
+        return BookSimpleInfoDto.builder()
+                .isbn13(book.getIsbn13())
+                .bookTitle(book.getBookname())
+                .bookAuthor(book.getAuthors())
+                .bookImageUrl(book.getBookImageURL())
+                .build();
+    }
+
 
 }
