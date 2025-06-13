@@ -32,8 +32,9 @@ public class BookAsyncLauncher {
         daeguLibraries = daeguLibraries.stream()
                 .filter(lib -> lib.getBookCount() != null) //  null인 도서관 제외!
                 .sorted(Comparator.comparingInt(LibraryEntity::getBookCount)) // 도서 수 오름차순
-                .skip(45) // 상위 10개 건너뛰고
-                .limit(9) // 다음 10개 가져오기
+               /* .skip(45) // 상위 10개 건너뛰고
+                .limit(9) // 다음 10개 가져오기*/
+                .filter(lib -> lib.getLibCode().equals("127093"))
                 .toList();
 
 
@@ -50,13 +51,14 @@ public class BookAsyncLauncher {
     @Async
     public void launchChungnamSaveJobWithPaging(Integer startPage, Integer endPage)
     {
-        List<LibraryEntity> daeguLibraries = libraryRepository.findByRegion_Si("충청남도");
+        List<LibraryEntity> daeguLibraries = libraryRepository.findByRegion_Si("대구광역시");
 
         daeguLibraries = daeguLibraries.stream()
                 .filter(lib -> lib.getBookCount() != null) //  null인 도서관 제외!
                 .sorted(Comparator.comparingInt(LibraryEntity::getBookCount)) // 도서 수 오름차순
-                .skip(45) // 상위 10개 건너뛰고
-                .limit(9) // 다음 10개 가져오기
+                .filter(lib -> lib.getLibCode().equals("127093"))
+         /*       .skip(45) // 상위 10개 건너뛰고
+                .limit(9) // 다음 10개 가져오기*/
                 .toList();
 
 

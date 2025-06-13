@@ -1,6 +1,8 @@
 package org.example.booknuri.domain.recommend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.booknuri.domain.Log.entity.BookViewLogEntity;
 import org.example.booknuri.domain.Log.entity.UserBookViewLogEntity;
 import org.example.booknuri.domain.Log.repository.BookViewLogRepository;
 import org.example.booknuri.domain.Log.repository.UserBookViewLogRepository;
@@ -8,6 +10,7 @@ import org.example.booknuri.domain.book.entity.BookEntity;
 import org.example.booknuri.domain.book.entity.MainCategory;
 import org.example.booknuri.domain.book.entity.MiddleCategory;
 import org.example.booknuri.domain.book.entity.SubCategory;
+import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.book.repository.MainCategoryRepository;
 import org.example.booknuri.domain.book.repository.MiddleCategoryRepository;
 import org.example.booknuri.domain.book.repository.SubCategoryRepository;
@@ -26,6 +29,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class RecommendService {
 
@@ -37,6 +41,7 @@ public class RecommendService {
     private final MainCategoryRepository  mainCategoryRepository;
     private final MiddleCategoryRepository middleCategoryRepository;
     private final SubCategoryRepository subCategoryRepository;
+    private final BookRepository bookRepository;
 
 
     /**
@@ -461,6 +466,120 @@ public class RecommendService {
                     );
                 })
                 .toList();
+
+
+
+
+
     }
+
+    //------------연관 책 추천하기---------------
+    public List<RecommendBookDto> getRelatedBooks(UserEntity user, Long bookId) {
+        String libCode = user.getMyLibrary().getLibCode();
+
+        // 1. A책을 본 최근 100명 유저 조회
+        List<String> usernames = bookViewLogRepository.findTopUsernamesByBook(bookId, PageRequest.of(0, 100));
+        log.info("✅ A책 [{}]을 본 최근 유저 수: {}", bookId, usernames.size());
+
+        Map<Long, Long> bookCountMap = new HashMap<>();
+
+        for (String username : usernames) {
+            List<BookViewLogEntity> logs = bookViewLogRepository.findAllByUsernameOrderByViewedAt(username);
+
+            // ✅ 20대 여성 제외
+            if (!logs.isEmpty()) {
+                BookViewLogEntity firstLog = logs.get(0);
+                if ("F".equals(firstLog.getGender()) &&
+                        firstLog.getBirthYear() >= 1996 &&
+                        firstLog.getBirthYear() <= 2005) {
+                    log.info("🚫 제외됨: 20대 여성 ({}), {}년생", username, firstLog.getBirthYear());
+                    continue;
+                }
+            }
+
+            int targetIndex = -1;
+            for (int i = 0; i < logs.size(); i++) {
+                if (logs.get(i).getBook().getId().equals(bookId)) {
+                    targetIndex = i;
+                    break;
+                }
+            }
+            if (targetIndex == -1) {
+                log.info("⚠️ {} 유저는 A책을 본 로그가 없음", username);
+                continue;
+            }
+
+            int start = Math.max(0, targetIndex - 10);
+            int end = Math.min(logs.size(), targetIndex + 11);
+
+            for (int i = start; i < end; i++) {
+                Long otherBookId = logs.get(i).getBook().getId();
+                if (!otherBookId.equals(bookId)) {
+                    bookCountMap.merge(otherBookId, 1L, Long::sum);
+                }
+            }
+        }
+
+        log.info("📊 연관 책 후보 수: {}", bookCountMap.size());
+
+        List<Long> sortedBookIds = bookCountMap.entrySet().stream()
+                .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                .map(Map.Entry::getKey)
+                .toList();
+
+        Map<Long, LibraryBookSearchDocument> docMap = getAvailableBookDocMap(sortedBookIds, libCode);
+        log.info("📚 사용 가능한 책 수 (도서관 필터링 결과): {}", docMap.size());
+
+        List<RecommendBookDto> result = sortedBookIds.stream()
+                .filter(docMap::containsKey)
+                .limit(10)
+                .map(id -> {
+                    LibraryBookSearchDocument doc = docMap.get(id);
+                    return new RecommendBookDto(
+                            doc.getBookId(),
+                            doc.getBookname(),
+                            doc.getAuthors(),
+                            doc.getBookImageURL(),
+                            doc.getIsbn13(),
+                            "",
+                            (long) doc.getLikeCount()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        // ✅ fallback 진입 여부 로그
+        log.info("📦 최종 추천 도서 수: {}", result.size());
+
+        // 3. 부족하면 → A책 카테고리 기반 fallback
+        if (result.size() < 10) {
+            log.info("📉 연관 도서 부족으로 fallback 시작 ({}권)", result.size());
+
+            // 🔁 bookId로 BookEntity 직접 조회
+            Optional<BookEntity> bookOpt = bookRepository.findById(bookId);
+            if (bookOpt.isEmpty()) {
+                log.warn("❌ fallback 실패 - BookEntity 찾을 수 없음: bookId={}", bookId);
+                return result;
+            }
+
+            BookEntity book = bookOpt.get();
+            String main = book.getMainCategory().getName();
+            String middle = book.getMiddleCategory() != null ? book.getMiddleCategory().getName() : null;
+            String sub = book.getSubCategory() != null ? book.getSubCategory().getName() : null;
+
+            List<RecommendBookDto> fallback = getCategoryBasedRecommend(user, main, middle, sub);
+            Set<Long> existing = result.stream().map(RecommendBookDto::getId).collect(Collectors.toSet());
+
+            fallback.stream()
+                    .filter(dto -> !existing.contains(dto.getId()))
+                    .limit(10 - result.size())
+                    .forEach(result::add);
+
+            log.info("✅ fallback 추천 결과 추가 완료. 최종 추천 도서 수: {}", result.size());
+        }
+
+        return result.stream().limit(10).toList();
+    }
+
+
 
 }

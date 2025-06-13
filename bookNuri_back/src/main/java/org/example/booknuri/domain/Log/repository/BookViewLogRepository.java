@@ -72,4 +72,25 @@ public interface BookViewLogRepository extends JpaRepository<BookViewLogEntity, 
     );
 
 
+    //--------------연관 책 추천---------------
+// ✅ 최근 A책 본 유저의 username 조회
+    @Query("""
+    SELECT b.user.username
+    FROM BookViewLogEntity b
+    WHERE b.book.id = :bookId
+    ORDER BY b.viewedAt DESC
+""")
+    List<String> findTopUsernamesByBook(@Param("bookId") Long bookId, Pageable pageable);
+
+
+    // ✅ username으로 viewed 로그 정렬 조회
+    @Query("""
+    SELECT b
+    FROM BookViewLogEntity b
+    WHERE b.user.username = :username
+    ORDER BY b.viewedAt
+""")
+    List<BookViewLogEntity> findAllByUsernameOrderByViewedAt(@Param("username") String username);
+
+
 }

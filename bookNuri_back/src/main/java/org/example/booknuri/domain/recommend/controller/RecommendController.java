@@ -62,5 +62,17 @@ public class RecommendController {
     }
 
 
+    //연관 책 추천
+    @GetMapping("/related")
+    public List<RecommendBookDto> getRelatedBooks(
+            @AuthenticationPrincipal CustomUser jwtuser,
+            @RequestParam("bookId") Long bookId
+    ) {
+        UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
+        return recommendService.getRelatedBooks(user, bookId);
+    }
+
+
+
 
 }
