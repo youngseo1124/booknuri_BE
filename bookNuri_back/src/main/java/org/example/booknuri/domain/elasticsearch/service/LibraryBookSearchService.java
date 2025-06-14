@@ -21,16 +21,19 @@ public class LibraryBookSearchService {
 
     private final ElasticsearchOperations operations;
 
-    //  도서 검색 (페이지네이션)
-    public LibraryBookSearchResponseDto searchBooks(String libCode, String keyword, String sortType, int offset, int limit) {
+    // 📚 도서 검색 (띄어쓰기 포함 검색 가능)
+    public LibraryBookSearchResponseDto searchBooks(String libCode, String keywordType, String keyword, String sortType, int offset, int limit) {
+        // ✅ 필드 결정: 제목 or 저자
+        String field = keywordType.equals("authors") ? "authors" : "bookname";
+
         Criteria criteria = new Criteria("libCode").is(libCode)
-                .and(new Criteria("bookname").contains(keyword));
+                .and(new Criteria(field).matches(keyword));  // 🔥 핵심 변경
 
         Sort sort = switch (sortType) {
             case "like" -> Sort.by(Sort.Order.desc("likeCount"));
             case "review" -> Sort.by(Sort.Order.desc("reviewCount"));
             case "new" -> Sort.by(Sort.Order.desc("publicationDate"));
-            case "old" -> Sort.by(Sort.Order.asc("publicationDate")); // ✅ 추가된 부분!
+            case "old" -> Sort.by(Sort.Order.asc("publicationDate"));
             default -> Sort.unsorted();
         };
 
@@ -48,10 +51,10 @@ public class LibraryBookSearchService {
     }
 
 
-    // 자동완성 기능 (페이지 고정)
+    // ✏️ 자동완성 검색
     public List<LibraryBookSearchDocument> searchBookAutocomplete(String libCode, String keyword) {
         Criteria criteria = new Criteria("libCode").is(libCode)
-                .and(new Criteria("bookname").startsWith(keyword));
+                .and(new Criteria("bookname").matches(keyword)); // ✅ 핵심 변경
 
         Query query = new CriteriaQuery(
                 criteria,

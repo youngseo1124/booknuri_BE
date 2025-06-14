@@ -1,6 +1,8 @@
 package org.example.booknuri.domain.recommend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.booknuri.domain.book.entity.BookEntity;
+import org.example.booknuri.domain.book.repository.BookRepository;
 import org.example.booknuri.domain.recommend.dto.RecommendBookDto;
 import org.example.booknuri.domain.recommend.service.RecommendService;
 import org.example.booknuri.domain.user.entity.UserEntity;
@@ -18,6 +20,7 @@ public class RecommendController {
 
     private final RecommendService recommendService;
     private final UserService userService;
+
 
     @GetMapping("/bestseller")
     public List<RecommendBookDto> getBestSeller(
@@ -66,13 +69,11 @@ public class RecommendController {
     @GetMapping("/related")
     public List<RecommendBookDto> getRelatedBooks(
             @AuthenticationPrincipal CustomUser jwtuser,
-            @RequestParam("bookId") Long bookId
+            @RequestParam("isbn13") String isbn13
     ) {
         UserEntity user = userService.getUserByUsername(jwtuser.getUsername());
-        return recommendService.getRelatedBooks(user, bookId);
+        return recommendService.getRelatedBooks(user, isbn13);
     }
-
-
 
 
 }

@@ -12,6 +12,8 @@ import org.example.booknuri.domain.bookQuote.converter.MyQuoteGroupedConverter;
 import org.example.booknuri.domain.bookQuote.dto.*;
 import org.example.booknuri.domain.bookQuote.entity.BookQuoteEntity;
 import org.example.booknuri.domain.bookQuote.repository.BookQuoteRepository;
+import org.example.booknuri.domain.elasticsearch.document.LibraryBookSearchDocument;
+import org.example.booknuri.domain.elasticsearch.repository.LibraryBookSearchRepository;
 import org.example.booknuri.domain.user.entity.UserEntity;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.*;
@@ -27,6 +29,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +44,7 @@ public class BookQuoteService {
     private final BookQuoteConverter bookQuoteConverter;
     private final MyQuoteConverter myQuoteConverter;
     private final MyQuoteGroupedConverter myQuoteGroupedConverter;
+    private final LibraryBookSearchRepository searchRepository;
 
     //  인용 등록
     public void createQuote(BookQuoteCreateRequestDto dto, UserEntity user) {
@@ -182,12 +187,34 @@ public class BookQuoteService {
 
     //인기 인용들 구하기
     public BookQuoteListResponseDto getPopularQuotes(int offset, int limit, UserEntity currentUser) {
-        List<BookQuoteEntity> list = bookQuoteRepository.findPopularQuotesWithRecency(offset, limit);
-        int totalCount = bookQuoteRepository.countByVisibleToPublicTrueAndIsActiveTrue();
+        String libCode = currentUser.getMyLibrary().getLibCode();
+
+        // ✅ 1. 인기 인용 전체 가져오기 (일단 1000개)
+        List<BookQuoteEntity> allPopularQuotes = bookQuoteRepository.findPopularQuotesWithRecency(0, 1000);
+
+        // ✅ 2. 인기 인용에서 ISBN13 리스트 추출
+        List<String> isbn13List = allPopularQuotes.stream()
+                .map(q -> q.getBook().getIsbn13())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        // ✅ 3. 내 도서관에 존재하는 ISBN13만 필터링
+        Set<String> availableIsbn13Set = searchRepository
+                .findByIsbn13InAndLibCode(isbn13List, libCode).stream()
+                .map(LibraryBookSearchDocument::getIsbn13)
+                .collect(Collectors.toSet());
+
+        // ✅ 4. 실제 필터링
+        List<BookQuoteEntity> filteredQuotes = allPopularQuotes.stream()
+                .filter(q -> availableIsbn13Set.contains(q.getBook().getIsbn13()))
+                .skip(offset)
+                .limit(limit)
+                .toList();
 
         return BookQuoteListResponseDto.builder()
-                .quotes(bookQuoteConverter.toDtoList(list, currentUser))
-                .totalCount(totalCount)
+                .quotes(bookQuoteConverter.toDtoList(filteredQuotes, currentUser))
+                .totalCount(filteredQuotes.size())
                 .build();
     }
 
@@ -195,7 +222,7 @@ public class BookQuoteService {
 
 
 
-   //내가 쓴 인용 책 그룹별로 묶어보기
+    //내가 쓴 인용 책 그룹별로 묶어보기
    public MyQuoteGroupedPageResponseDto getMyQuotesGroupedByBook(UserEntity user, int offset, int limit) {
        Pageable pageable = PageRequest.of(offset / limit, limit);
 

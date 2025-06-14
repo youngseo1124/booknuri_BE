@@ -23,11 +23,12 @@ public class LibraryBookSearchController {
     public ResponseEntity<LibraryBookSearchResponseDto> search(
             @RequestParam String libCode,
             @RequestParam String keyword,
+            @RequestParam(defaultValue = "bookname") String keywordType, // 🔥 추가: bookname 또는 authors
             @RequestParam(defaultValue = "score") String sort,
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "20") int limit
     ) {
-        LibraryBookSearchResponseDto result = searchService.searchBooks(libCode, keyword, sort, offset, limit);
+        LibraryBookSearchResponseDto result = searchService.searchBooks(libCode, keywordType, keyword, sort, offset, limit);
         return ResponseEntity.ok(result);
     }
 

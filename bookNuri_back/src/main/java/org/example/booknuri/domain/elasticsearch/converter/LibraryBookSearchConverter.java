@@ -24,6 +24,7 @@ public class LibraryBookSearchConverter {
                 .likeCount(viewCount)
                 .reviewCount(reviewCount)
 
+
                 // 카테고리
                 .mainCategoryId(book.getMainCategory() != null ? book.getMainCategory().getId() : null)
                 .middleCategoryId(book.getMiddleCategory() != null ? book.getMiddleCategory().getId() : null)

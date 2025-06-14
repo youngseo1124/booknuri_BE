@@ -9,9 +9,16 @@ public interface LibraryBookSearchRepository extends ElasticsearchRepository<Lib
     List<LibraryBookSearchDocument> findByBookIdInAndLibCode(List<Long> bookIds, String libCode);
 
 
+
+
     List<LibraryBookSearchDocument> findByLibCodeAndMainCategoryId(String libCode, Long mainCategoryId);
 
     List<LibraryBookSearchDocument> findByLibCodeAndMiddleCategoryId(String libCode, Long categoryId);
+
+
+    // LibraryBookSearchRepository.java
+    List<LibraryBookSearchDocument> findByIsbn13InAndLibCode(List<String> isbn13List, String libCode);
+
 
     List<LibraryBookSearchDocument> findByLibCodeAndSubCategoryId(String libCode, Long categoryId);
 }

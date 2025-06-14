@@ -1,0 +1,46 @@
+{
+  "settings": {
+    "index": {
+      "max_ngram_diff": 10
+    },
+    "analysis": {
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 10,
+          "token_chars": ["letter", "digit", "whitespace"]
+        }
+      },
+      "analyzer": {
+        "ngram_analyzer": {
+          "type": "custom",
+          "tokenizer": "ngram_tokenizer",
+          "filter": ["lowercase"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "id": { "type": "keyword" },
+      "libCode": { "type": "keyword" },
+      "bookId": { "type": "long" },
+      "bookname": {
+        "type": "text",
+        "analyzer": "ngram_analyzer",
+        "search_analyzer": "standard"
+      },
+      "authors": { "type": "text" },
+      "publisher": { "type": "text" },
+      "publicationDate": { "type": "integer" },
+      "isbn13": { "type": "keyword" },
+      "bookImageURL": { "type": "keyword" },
+      "likeCount": { "type": "integer" },
+      "reviewCount": { "type": "integer" },
+      "mainCategoryId": { "type": "long" },
+      "middleCategoryId": { "type": "long" },
+      "subCategoryId": { "type": "long" }
+    }
+  }
+}
