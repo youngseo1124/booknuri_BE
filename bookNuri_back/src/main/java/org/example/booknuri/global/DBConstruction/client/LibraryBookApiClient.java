@@ -92,11 +92,14 @@ public class LibraryBookApiClient {
             Document doc = Jsoup.parse(responseBody, "", Parser.xmlParser());
             Elements docElements = doc.select("doc");
 
-            if (docElements.isEmpty()) {
+            // XML에서 resultNum도 같이 파싱해서 0이면 종료로 간주하자
+            String resultNumText = doc.selectFirst("resultNum") != null ? doc.selectFirst("resultNum").text() : "0";
+            int resultNum = Integer.parseInt(resultNumText);
+
+            if (resultNum == 0 || docElements.isEmpty()) {
                 log.info("[{}] page {} - 더 이상 도서 없음", libCode, page);
                 break;
             }
-
             log.info("[{}] page {} - {}권 수집됨", libCode, page, docElements.size());
 
             for (Element el : docElements) {

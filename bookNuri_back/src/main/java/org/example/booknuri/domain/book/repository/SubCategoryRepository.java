@@ -10,4 +10,6 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
     Optional<SubCategory> findByName(String name);
 
     Optional<SubCategory> findByNameAndMiddleCategoryName(String name, String middleCategoryName);
+
+    Optional<SubCategory> findByNameAndMiddleCategoryId(String name, Long middleCategoryId);
 }

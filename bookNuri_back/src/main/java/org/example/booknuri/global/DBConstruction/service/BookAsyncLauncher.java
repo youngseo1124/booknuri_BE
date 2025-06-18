@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -51,17 +52,17 @@ public class BookAsyncLauncher {
     @Async
     public void launchChungnamSaveJobWithPaging(Integer startPage, Integer endPage)
     {
-        List<LibraryEntity> daeguLibraries = libraryRepository.findByRegion_Si("대구광역시");
+        List<LibraryEntity> daeguLibraries = libraryRepository.findByRegion_Si("충청남도");
+
+       /* Set<String> targetLibCodes = Set.of("144068", "144028", "144041","144010", "144023", "144003","144058");*/
 
         daeguLibraries = daeguLibraries.stream()
-                .filter(lib -> lib.getBookCount() != null) //  null인 도서관 제외!
+                .filter(lib -> lib.getBookCount() != null) // null인 도서관 제외!
+              /*  .filter(lib -> targetLibCodes.contains(lib.getLibCode())) // 여러 libCode 중 포함되는 것만 필터!*/
                 .sorted(Comparator.comparingInt(LibraryEntity::getBookCount)) // 도서 수 오름차순
-                .filter(lib -> lib.getLibCode().equals("127093"))
-         /*       .skip(45) // 상위 10개 건너뛰고
-                .limit(9) // 다음 10개 가져오기*/
+        /*        .skip(10) // 상위 10개 건너뛰고
+                .limit(9) // 다음 9개 가져오기*/
                 .toList();
-
-
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (LibraryEntity lib : daeguLibraries) {
             futures.add(processorService.processLibraryBooksAsync(lib, startPage, endPage));

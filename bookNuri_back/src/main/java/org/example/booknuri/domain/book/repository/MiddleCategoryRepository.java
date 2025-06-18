@@ -11,4 +11,8 @@ public interface MiddleCategoryRepository extends JpaRepository<MiddleCategory, 
 
 
     Optional<MiddleCategory> findByNameAndMainCategoryName(String name, String mainCategoryName);
+
+
+    Optional<MiddleCategory> findByNameAndMainCategoryId(String name, Long mainCategoryId);
+
 }

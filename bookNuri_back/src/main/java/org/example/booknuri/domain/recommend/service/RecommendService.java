@@ -45,7 +45,7 @@ public class RecommendService {
 
 
     /**
-     * ✅ 주어진 bookId 리스트 중, 실제 해당 도서관(libCode)에 존재하는 책만 필터링한 Map 반환
+     *  주어진 bookId 리스트 중, 실제 해당 도서관(libCode)에 존재하는 책만 필터링한 Map 반환
      * key = bookId, value = LibraryBookSearchDocument
      */
     private Map<Long, LibraryBookSearchDocument> getAvailableBookDocMap(List<Long> bookIds, String libCode) {
@@ -57,7 +57,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ RecommendBookDto 리스트에서 bookId만 추출
+     *  RecommendBookDto 리스트에서 bookId만 추출
      */
     private List<Long> extractBookIds(List<RecommendBookDto> books) {
         return books.stream()
@@ -67,7 +67,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ 베스트셀러 추천 (기간 및 선택적 메인 카테고리 필터)
+     *  베스트셀러 추천 (기간 및 선택적 메인 카테고리 필터)
      * - 카테고리 없으면 전체 인기 도서
      * - 카테고리 있으면 해당 카테고리 내에서 인기 도서
      */
@@ -84,7 +84,7 @@ public class RecommendService {
         for (String p : priority) {
             LocalDate startDate = getStartDateByPeriod(p);
 
-            // ✅ mainCategory 있는 경우
+            //  mainCategory 있는 경우
             if (mainCategoryId != null) {
                 List<RecommendBookDto> books = recommendRepository.findPopularBooksByCategory(
                         libCode, mainCategoryId, startDate, PageRequest.of(0, 100)
@@ -101,7 +101,7 @@ public class RecommendService {
                         })
                         .toList();
 
-                // ✅ fallback 로직: 부족하면 같은 main 카테고리 + 이미지 있는 책으로 채움
+                //  fallback 로직: 부족하면 같은 main 카테고리 + 이미지 있는 책으로 채움
                 if (filtered.size() < 20) {
                     Set<Long> alreadyIncluded = filtered.stream()
                             .map(RecommendBookDto::getId)
@@ -135,7 +135,7 @@ public class RecommendService {
                 return filtered.stream().limit(20).toList(); // 이미 충분하면 여기서 반환
             }
 
-            // ✅ mainCategory 없을 경우 기본 전체 인기 도서 추천
+            //  mainCategory 없을 경우 기본 전체 인기 도서 추천
             else {
                 List<Long> topBookIds = viewCountRepository.findTopBookIds(startDate, PageRequest.of(0, 100));
                 if (topBookIds.isEmpty()) continue;
@@ -166,7 +166,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ 기간 문자열에 따른 시작일 반환
+     *  기간 문자열에 따른 시작일 반환
      */
     private LocalDate getStartDateByPeriod(String period) {
         return switch (period) {
@@ -178,7 +178,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ 특정 카테고리 기반 추천 시도 (중복 제거 및 limit까지)
+     *  특정 카테고리 기반 추천 시도 (중복 제거 및 limit까지)
      */
     private List<RecommendBookDto> recommendFromCategory(
             String categoryType, Long categoryId, Set<Long> excludeIds, String libCode
@@ -212,7 +212,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ 카테고리 집합 (Map<categoryId, count>) 기반 추천
+     *  카테고리 집합 (Map<categoryId, count>) 기반 추천
      */
     private List<RecommendBookDto> recommendFromCategoryMap(
             Map<Long, Long> categoryMap,
@@ -242,7 +242,7 @@ public class RecommendService {
 
 
     /**
-     * ✅ 메인/미들/서브 카테고리 기반 추천
+     *  메인/미들/서브 카테고리 기반 추천
      * - sub → middle → main 순서로 fallback
      * - 실제 내 도서관(libCode)에 있는 책만 10권 추천
      */
@@ -256,15 +256,24 @@ public class RecommendService {
         String libCode = user.getMyLibrary().getLibCode();
         LocalDate startDate = LocalDate.now().minusDays(300);
 
+        log.info(" [카테고리 추천 시작] main='{}', middle='{}', sub='{}'",
+                mainCategoryName, middleCategoryName, subCategoryName);
+
         Long mainCategoryId = mainCategoryRepository.findByName(mainCategoryName)
                 .map(MainCategory::getId)
-                .orElseThrow(() -> new IllegalArgumentException("mainCategoryName 잘못됨"));
-        Long middleCategoryId = middleCategoryRepository.findByNameAndMainCategoryName(middleCategoryName, mainCategoryName)
-                .map(MiddleCategory::getId)
-                .orElse(null);
-        Long subCategoryId = subCategoryRepository.findByNameAndMiddleCategoryName(subCategoryName, middleCategoryName)
-                .map(SubCategory::getId)
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("❌ mainCategoryName 잘못됨: " + mainCategoryName));
+
+        Long middleCategoryId = middleCategoryName != null
+                ? middleCategoryRepository.findByNameAndMainCategoryId(middleCategoryName, mainCategoryId)
+                .map(MiddleCategory::getId).orElse(null)
+                : null;
+
+
+        Long subCategoryId = subCategoryName != null && middleCategoryId != null
+                ? subCategoryRepository.findByNameAndMiddleCategoryId(subCategoryName, middleCategoryId)
+                .map(SubCategory::getId).orElse(null)
+                : null;
+
 
         Set<Long> addedBookIds = new HashSet<>();
         List<RecommendBookDto> result = new ArrayList<>();
@@ -273,20 +282,28 @@ public class RecommendService {
         result.addAll(getTopBooksByCategory(libCode, startDate, addedBookIds, targetCount - result.size(),
                 mainCategoryId, middleCategoryId, subCategoryId));
 
+
         // 2단계: main + middle
         if (result.size() < targetCount) {
+
             result.addAll(getTopBooksByCategory(libCode, startDate, addedBookIds, targetCount - result.size(),
                     mainCategoryId, middleCategoryId, null));
+
         }
 
         // 3단계: main only
         if (result.size() < targetCount) {
+
             result.addAll(getTopBooksByCategory(libCode, startDate, addedBookIds, targetCount - result.size(),
                     mainCategoryId, null, null));
+
         }
+
 
         return result.stream().limit(targetCount).toList();
     }
+
+
 
 
 
@@ -300,10 +317,16 @@ public class RecommendService {
             Long expectedMiddleId,
             Long expectedSubId
     ) {
-        log.info("📌 getTopBooksByCategory 호출: main={}, middle={}, sub={}, limit={}", expectedMainId, expectedMiddleId, expectedSubId, limit);
+        log.info("🛠️ getTopBooksByCategory 호출: mainId={}, middleId={}, subId={}, limit={}",
+                expectedMainId, expectedMiddleId, expectedSubId, limit);
 
-        List<Long> bookIds = viewCountRepository.findTopBookIds(startDate, PageRequest.of(0, 200)); // 넉넉히
+        List<Long> bookIds = viewCountRepository.findTopBookIdsByMainCategory(
+                expectedMainId, startDate, PageRequest.of(0, 500)
+        );
+        log.info("📌 인기 BookId 수: {}", bookIds.size());
+
         Map<Long, LibraryBookSearchDocument> docMap = getAvailableBookDocMap(bookIds, libCode);
+        log.info("📌 Elasticsearch 필터 후 사용 가능 Book 수: {}", docMap.size());
 
         List<RecommendBookDto> result = new ArrayList<>();
 
@@ -311,18 +334,35 @@ public class RecommendService {
             if (result.size() >= limit) break;
 
             LibraryBookSearchDocument doc = docMap.get(id);
-            if (doc == null || addedBookIds.contains(id)) continue;
-            if (doc.getBookImageURL() == null || doc.getBookImageURL().isBlank()) continue;
+            if (doc == null) {
+                continue;
+            }
 
-            BookEntity book = bookRepository.findById(id).orElse(null);
-            if (book == null) continue;
+            if (addedBookIds.contains(id)) {
 
-            if (expectedMainId != null && (book.getMainCategory() == null || !book.getMainCategory().getId().equals(expectedMainId))) continue;
-            if (expectedMiddleId != null && (book.getMiddleCategory() == null || !book.getMiddleCategory().getId().equals(expectedMiddleId))) continue;
-            if (expectedSubId != null && (book.getSubCategory() == null || !book.getSubCategory().getId().equals(expectedSubId))) continue;
+                continue;
+            }
 
+            if (doc.getBookImageURL() == null || doc.getBookImageURL().isBlank()) {
+                continue;
+            }
+
+            //  카테고리 조건: Elasticsearch 문서 기준으로만 비교
+            if (expectedMainId != null && !expectedMainId.equals(doc.getMainCategoryId())) {
+                continue;
+            }
+
+            if (expectedMiddleId != null && !expectedMiddleId.equals(doc.getMiddleCategoryId())) {
+                continue;
+            }
+
+            if (expectedSubId != null && !expectedSubId.equals(doc.getSubCategoryId())) {
+                continue;
+            }
+
+            //  추천 추가
             addedBookIds.add(id);
-            result.add(new RecommendBookDto(
+            RecommendBookDto dto = new RecommendBookDto(
                     doc.getBookId(),
                     doc.getBookname(),
                     doc.getAuthors(),
@@ -330,10 +370,11 @@ public class RecommendService {
                     doc.getIsbn13(),
                     "",
                     (long) doc.getLikeCount()
-            ));
+            );
+            result.add(dto);
         }
 
-        log.info("✅ 추천 결과 {}건 (main={}, middle={}, sub={})", result.size(), expectedMainId, expectedMiddleId, expectedSubId);
+        log.info("📦 최종 추천 결과: {}권", result.size());
         return result;
     }
 
@@ -342,8 +383,11 @@ public class RecommendService {
 
 
 
+
+
+
     /**
-     * ✅ 개인 맞춤 추천------------------------------------------------------------
+     *  개인 맞춤 추천------------------------------------------------------------
      */
     public List<RecommendBookDto> getPersonalizedRecommendation(UserEntity user) {
         String libCode = user.getMyLibrary().getLibCode();
@@ -387,7 +431,7 @@ public class RecommendService {
     }
 
     /**
-     * ✅ 연령 + 성별 기반 베스트셀러
+     *  연령 + 성별 기반 베스트셀러
      */
     public List<RecommendBookDto> getDemographicRecommend(
             UserEntity user,
@@ -442,28 +486,26 @@ public class RecommendService {
     public List<RecommendBookDto> getRelatedBooks(UserEntity user, String isbn13) {
         String libCode = user.getMyLibrary().getLibCode();
 
-        // 🔍 ISBN으로 BookEntity 조회
+        //  ISBN으로 BookEntity 조회
         BookEntity baseBook = bookRepository.findByIsbn13(isbn13)
                 .orElseThrow(() -> new IllegalArgumentException("❌ 해당 ISBN의 도서를 찾을 수 없습니다: " + isbn13));
         Long bookId = baseBook.getId();
 
-        // ✅ 1. A책을 본 최근 100명 유저 조회
+        // 1. A책을 본 최근 100명 유저 조회
         List<String> usernames = bookViewLogRepository.findTopUsernamesByBook(bookId, PageRequest.of(0, 100));
-        log.info("✅ A책 [{} - {}]을 본 최근 유저 수: {}", bookId, baseBook.getBookname(), usernames.size());
+
 
         Map<Long, Long> bookCountMap = new HashMap<>();
 
         for (String username : usernames) {
             List<BookViewLogEntity> logs = bookViewLogRepository.findAllByUsernameOrderByViewedAt(username);
 
-            // ✅ 20대 여성 제외
+            //  20대 여성 제외(후에 주석처리)
             if (!logs.isEmpty()) {
                 BookViewLogEntity firstLog = logs.get(0);
                 if ("F".equals(firstLog.getGender()) &&
                         firstLog.getBirthYear() >= 1996 &&
                         firstLog.getBirthYear() <= 2005) {
-                    log.info("🚫 제외됨: 20대 여성 ({}), {}년생", username, firstLog.getBirthYear());
-                    continue;
                 }
             }
 
@@ -475,7 +517,6 @@ public class RecommendService {
                 }
             }
             if (targetIndex == -1) {
-                log.info("⚠️ {} 유저는 A책을 본 로그가 없음", username);
                 continue;
             }
 
@@ -492,13 +533,20 @@ public class RecommendService {
 
         log.info("📊 연관 책 후보 수: {}", bookCountMap.size());
 
+
+
         List<Long> sortedBookIds = bookCountMap.entrySet().stream()
+                .filter(entry -> entry.getValue() >= 3) // !!3회 이상 등장한 책만 필터링
                 .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
                 .map(Map.Entry::getKey)
                 .toList();
 
+
+
+
+
         Map<Long, LibraryBookSearchDocument> docMap = getAvailableBookDocMap(sortedBookIds, libCode);
-        log.info("📚 사용 가능한 책 수 (도서관 필터링 결과): {}", docMap.size());
+
 
         List<RecommendBookDto> result = sortedBookIds.stream()
                 .filter(docMap::containsKey)
@@ -519,7 +567,7 @@ public class RecommendService {
 
         log.info("📦 최종 추천 도서 수: {}", result.size());
 
-        // ✅ fallback: 카테고리 기반 보완
+        //  fallback: 카테고리 기반 보완
         if (result.size() < 10) {
             log.info("📉 연관 도서 부족으로 fallback 시작 ({}권)", result.size());
 
