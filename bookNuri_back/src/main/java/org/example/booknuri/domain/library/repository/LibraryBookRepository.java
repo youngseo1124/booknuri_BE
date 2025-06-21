@@ -31,5 +31,8 @@ public interface LibraryBookRepository extends JpaRepository<LibraryBookEntity, 
     @Query("SELECT lb FROM LibraryBookEntity lb JOIN FETCH lb.book WHERE lb.libCode IN :libCodeList")
     Page<LibraryBookEntity> findByLibCodeInFetchBook(@Param("libCodeList") List<String> libCodeList, Pageable pageable);
 
+    @Query("SELECT lb FROM LibraryBookEntity lb JOIN FETCH lb.book WHERE lb.book.id IN :bookIds")
+    List<LibraryBookEntity> findByBookIdInFetchBook(@Param("bookIds") Set<Long> bookIds);
+
 
 }

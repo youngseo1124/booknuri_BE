@@ -53,7 +53,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // ✅ 2. Authorization 헤더 로그
         String authHeader = request.getHeader("Authorization");
-        log.info("🔐 Authorization 헤더: {}", authHeader);
+/*        log.info("🔐 Authorization 헤더: {}", authHeader);*/
 
         String jwt = extractTokenFromHeader(request); // Authorization 헤더에서 JWT 추출
 

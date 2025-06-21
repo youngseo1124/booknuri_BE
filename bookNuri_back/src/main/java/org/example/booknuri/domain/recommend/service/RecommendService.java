@@ -255,9 +255,9 @@ public class RecommendService {
         final int targetCount = 10;
         String libCode = user.getMyLibrary().getLibCode();
         LocalDate startDate = LocalDate.now().minusDays(300);
-
+/*
         log.info(" [카테고리 추천 시작] main='{}', middle='{}', sub='{}'",
-                mainCategoryName, middleCategoryName, subCategoryName);
+                mainCategoryName, middleCategoryName, subCategoryName);*/
 
         Long mainCategoryId = mainCategoryRepository.findByName(mainCategoryName)
                 .map(MainCategory::getId)
@@ -317,16 +317,16 @@ public class RecommendService {
             Long expectedMiddleId,
             Long expectedSubId
     ) {
-        log.info("🛠️ getTopBooksByCategory 호출: mainId={}, middleId={}, subId={}, limit={}",
-                expectedMainId, expectedMiddleId, expectedSubId, limit);
+/*        log.info("🛠️ getTopBooksByCategory 호출: mainId={}, middleId={}, subId={}, limit={}",
+                expectedMainId, expectedMiddleId, expectedSubId, limit);*/
 
         List<Long> bookIds = viewCountRepository.findTopBookIdsByMainCategory(
                 expectedMainId, startDate, PageRequest.of(0, 500)
         );
-        log.info("📌 인기 BookId 수: {}", bookIds.size());
+     /*   log.info("📌 인기 BookId 수: {}", bookIds.size());*/
 
         Map<Long, LibraryBookSearchDocument> docMap = getAvailableBookDocMap(bookIds, libCode);
-        log.info("📌 Elasticsearch 필터 후 사용 가능 Book 수: {}", docMap.size());
+     /*   log.info("📌 Elasticsearch 필터 후 사용 가능 Book 수: {}", docMap.size());*/
 
         List<RecommendBookDto> result = new ArrayList<>();
 
@@ -374,7 +374,7 @@ public class RecommendService {
             result.add(dto);
         }
 
-        log.info("📦 최종 추천 결과: {}권", result.size());
+     /*   log.info("📦 최종 추천 결과: {}권", result.size());*/
         return result;
     }
 

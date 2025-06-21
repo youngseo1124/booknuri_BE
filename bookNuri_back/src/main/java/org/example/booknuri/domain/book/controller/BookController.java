@@ -59,7 +59,7 @@ public class BookController {
             // 3. 내가 책장에 담았는지 여부 확인
             boolean isAdded = myBookshelfRepository.existsByUserAndBook(user, bookEntity);
 
-            // 4. 로그 저장
+            // 4. 로그 저장(비동기용)
             bookViewLogService.logBookView(user, bookEntity);
 
             // 5. 응답 반환

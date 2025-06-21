@@ -83,7 +83,7 @@ public class LibraryBookIndexService {
         log.info("🎉 전체 색인 완료");
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void indexSingleLibraryBook(LibraryBookEntity lb) {
         BookEntity book = lb.getBook();
         LocalDate now = LocalDate.now();
